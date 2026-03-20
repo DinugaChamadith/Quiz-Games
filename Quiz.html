@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuestMaster | Premium Quiz Gaming</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+        }
+
+        .option-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .option-btn.selected {
+            background: #6366f1;
+            border-color: #818cf8;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+            transform: scale(1.02);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #6366f1;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="p-0 m-0">
+
+    <!-- Premium Navigation Bar -->
+    <nav class="sticky top-0 z-50 glass-card !rounded-none border-b border-white/5 px-6 py-4 mb-8">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-8">
+                <h1 onclick="showLobby()" class="text-2xl font-extrabold tracking-tight cursor-pointer">QUEST<span class="gradient-text">MASTER</span></h1>
+                <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                    <a href="#" onclick="showLobby()" class="nav-link hover:text-white">Lobby</a>
+                    <a href="#" class="nav-link hover:text-white">Leaderboards</a>
+                    <a href="#" class="nav-link hover:text-white">Achievements</a>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="glass-card px-4 py-2 flex items-center gap-2 text-sm bg-white/5">
+                    <span class="text-yellow-400">🏆</span>
+                    <span id="global-score-nav" class="font-bold">0 pts</span>
+                </div>
+                <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center border-2 border-white/20">
+                    <span class="text-xs font-bold">JD</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="app" class="max-w-7xl mx-auto px-6 flex-grow w-full pb-20">
+        
+        <!-- Lobby Section -->
+        <div id="lobby-section">
+            <div class="flex justify-between items-end mb-8 animate-fade">
+                <div>
+                    <h2 class="text-3xl font-bold mb-1">Game Center</h2>
+                    <p class="text-slate-400">Select a category and start your journey</p>
+                </div>
+                <div class="text-sm text-slate-500 font-medium" id="page-indicator">Page 1 of 2</div>
+            </div>
+
+            <!-- Game Grid -->
+            <div id="lobby" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade">
+                <!-- 12 Cards will be injected here per page -->
+            </div>
+
+            <!-- Premium Pagination -->
+            <div class="mt-12 flex justify-center items-center gap-4 animate-fade">
+                <button id="page-prev" onclick="changePage(-1)" class="glass-card px-6 py-3 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition font-bold">
+                    Previous
+                </button>
+                <div id="page-numbers" class="flex gap-2">
+                    <!-- Page numbers injected here -->
+                </div>
+                <button id="page-next-nav" onclick="changePage(1)" class="glass-card px-6 py-3 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition font-bold">
+                    Next
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Play Screen (unchanged logic, updated layout) -->
+        <div id="quiz-screen" class="hidden animate-fade max-w-4xl mx-auto">
+            <div class="glass-card p-6 md:p-10">
+                <div class="flex justify-between items-center mb-8">
+                    <button onclick="showLobby()" class="text-slate-400 hover:text-white flex items-center gap-2 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                        </svg>
+                        Exit Game
+                    </button>
+                    <div class="text-sm font-semibold text-indigo-400" id="progress-text">Question 1 of 10</div>
+                </div>
+
+                <div id="question-area">
+                    <h2 id="question-title" class="text-2xl font-bold mb-8 leading-snug">Loading Question...</h2>
+                    <div id="options-grid" class="grid grid-cols-1 gap-4">
+                        <!-- Options injected here -->
+                    </div>
+                </div>
+
+                <div class="mt-10 flex flex-col sm:flex-row justify-between items-center border-t border-white/10 pt-8 gap-4">
+                    <div class="flex gap-2 items-center" id="pagination-dots">
+                        <!-- Dots injected here -->
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button id="prev-btn" onclick="prevQuestion()" class="hidden border border-white/10 hover:bg-white/5 px-6 py-3 rounded-xl font-bold transition text-slate-300">
+                            Previous
+                        </button>
+                        <button id="next-btn" onclick="nextQuestion()" class="bg-indigo-600 hover:bg-indigo-500 px-8 py-3 rounded-xl font-bold transition shadow-lg shadow-indigo-500/20">
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="hidden animate-fade max-w-4xl mx-auto">
+            <div class="glass-card p-8 md:p-12 text-center mb-8">
+                <div class="text-6xl mb-4">🎉</div>
+                <h2 class="text-4xl font-extrabold mb-2">Quiz Complete!</h2>
+                <p class="text-slate-400 mb-6" id="result-category">Category Name</p>
+                <div class="flex justify-center gap-8 mb-8">
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-indigo-400" id="final-score">0/10</p>
+                        <p class="text-xs uppercase tracking-widest text-slate-500">Correct</p>
+                    </div>
+                    <div class="text-center border-l border-white/10 pl-8">
+                        <p class="text-3xl font-bold text-purple-400" id="percentage">0%</p>
+                        <p class="text-xs uppercase tracking-widest text-slate-500">Accuracy</p>
+                    </div>
+                </div>
+                <button onclick="showLobby()" class="bg-white text-indigo-950 px-10 py-3 rounded-xl font-bold hover:bg-indigo-50 transition">
+                    Back to Lobby
+                </button>
+            </div>
+            <div class="glass-card p-6 md:p-8">
+                <h3 class="text-xl font-bold mb-6">Review Answers</h3>
+                <div id="review-list" class="space-y-6"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Page Footer -->
+    <footer class="bg-slate-900/50 border-t border-white/5 py-12 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div class="col-span-1 md:col-span-2">
+                <h3 class="text-xl font-bold mb-4">QUEST<span class="gradient-text">MASTER</span></h3>
+                <p class="text-slate-400 max-w-md mb-6">The world's premier platform for intellectual challenges and trivia gaming. Compete, learn, and master your favorite subjects with our hand-curated quiz experiences.</p>
+                <div class="flex gap-4">
+                    <div class="h-10 w-10 rounded-lg glass-card flex items-center justify-center hover:bg-indigo-500 transition cursor-pointer">𝕏</div>
+                    <div class="h-10 w-10 rounded-lg glass-card flex items-center justify-center hover:bg-indigo-500 transition cursor-pointer">IG</div>
+                    <div class="h-10 w-10 rounded-lg glass-card flex items-center justify-center hover:bg-indigo-500 transition cursor-pointer">YT</div>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 text-white">Platform</h4>
+                <ul class="text-slate-400 space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-indigo-400">Categories</a></li>
+                    <li><a href="#" class="hover:text-indigo-400">Daily Challenge</a></li>
+                    <li><a href="#" class="hover:text-indigo-400">Pro Features</a></li>
+                    <li><a href="#" class="hover:text-indigo-400">Leaderboard</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 text-white">Support</h4>
+                <ul class="text-slate-400 space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-indigo-400">Help Center</a></li>
+                    <li><a href="#" class="hover:text-indigo-400">Terms of Service</a></li>
+                    <li><a href="#" class="hover:text-indigo-400">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-indigo-400">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/5 text-center text-slate-500 text-sm">
+            © 2024 QuestMaster Premium Quiz Hub. All rights reserved. Made for Masterminds.
+        </div>
+    </footer>
+
+    <script>
+        // Content remains identical but expanded to show pagination (15 categories total)
+        const quizData = [
+            { id: 'science', title: 'Quantum Science', icon: '🔬', description: 'Test your knowledge on physics and biology.', questions: [{ q: "What is the chemical symbol for Gold?", a: ["Gd", "Au", "Ag", "Pb"], c: 1 }, { q: "Which planet is known as the Red Planet?", a: ["Venus", "Jupiter", "Mars", "Saturn"], c: 2 }, { q: "What is the power house of the cell?", a: ["Nucleus", "Ribosome", "Mitochondria", "Vacuole"], c: 2 }, { q: "Which gas do plants primarily absorb?", a: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], c: 1 }, { q: "What is the boiling point of water at sea level?", a: ["90°C", "110°C", "100°C", "120°C"], c: 2 }, { q: "Who developed the theory of relativity?", a: ["Newton", "Einstein", "Tesla", "Curie"], c: 1 }, { q: "What is the hardest natural substance?", a: ["Gold", "Iron", "Diamond", "Quartz"], c: 2 }, { q: "How many bones are in the adult human body?", a: ["206", "180", "212", "250"], c: 0 }, { q: "Which part of the brain controls balance?", a: ["Cerebrum", "Cerebellum", "Brainstem", "Thalamus"], c: 1 }, { q: "What speed does light travel approximately?", a: ["300,000 km/s", "150,000 km/s", "500,000 km/s", "1,000,000 km/s"], c: 0 }] },
+            { id: 'gaming', title: 'Pro Gaming', icon: '🎮', description: 'For the ultimate fans of pixel and polygon.', questions: [{ q: "Which game features 'Master Chief'?", a: ["Doom", "Halo", "Mass Effect", "Metroid"], c: 1 }, { q: "What year was the original PlayStation released in Japan?", a: ["1992", "1994", "1996", "1998"], c: 1 }, { q: "Which plumber is Mario's brother?", a: ["Wario", "Walugi", "Luigi", "Yoshi"], c: 2 }, { q: "In Minecraft, what do you need to make a portal to the Nether?", a: ["Cobblestone", "Obsidian", "Diamond", "Bedrock"], c: 1 }, { q: "Which game company created 'Zelda'?", a: ["Sega", "Sony", "Nintendo", "Ubisoft"], c: 2 }, { q: "What is the best-selling video game of all time?", a: ["Tetris", "GTA V", "Minecraft", "Wii Sports"], c: 2 }, { q: "What is the name of the kingdom in Super Mario Odyssey?", a: ["Mushroom", "Cloud", "Metro", "Sand"], c: 0 }, { q: "Which MOBA features a map called Summoner's Rift?", a: ["Dota 2", "Smite", "League of Legends", "Heroes of the Storm"], c: 2 }, { q: "Who is the protagonist of 'The Witcher' series?", a: ["Geralt", "Ciri", "Vesemir", "Lambert"], c: 0 }, { q: "What does 'FPS' stand for in gaming?", a: ["Fast Pace Shooter", "First Person Shooter", "Final Point System", "Front Plane Speed"], c: 1 }] },
+            { id: 'history', title: 'World History', icon: '🏛️', description: 'Journey through the timeline of humanity.', questions: [{ q: "Who was the first President of the United States?", a: ["Jefferson", "Lincoln", "Washington", "Adams"], c: 2 }, { q: "In which year did World War II end?", a: ["1943", "1944", "1945", "1946"], c: 2 }, { q: "Which empire built the Colosseum?", a: ["Greek", "Roman", "Persian", "Egyptian"], c: 1 }, { q: "Who discovered America in 1492?", a: ["Vasco da Gama", "Magellan", "Columbus", "Cook"], c: 2 }, { q: "The Great Wall of China was built to keep out which group?", a: ["Mongols", "Romans", "Vikings", "Persians"], c: 0 }, { q: "Who was the 'Maid of Orleans'?", a: ["Joan of Arc", "Marie Antoinette", "Catherine the Great", "Elizabeth I"], c: 0 }, { q: "What was the capital of the Byzantine Empire?", a: ["Rome", "Athens", "Constantinople", "Cairo"], c: 2 }, { q: "The Renaissance began in which country?", a: ["France", "Spain", "Italy", "Germany"], c: 2 }, { q: "Who was the leader of the Soviet Union during WWII?", a: ["Lenin", "Stalin", "Khrushchev", "Gorbachev"], c: 1 }, { q: "Which ancient civilization built the pyramids?", a: ["Maya", "Aztec", "Inca", "Egyptian"], c: 3 }] },
+            { id: 'geography', title: 'Exploration', icon: '🌍', description: 'Continents, oceans, and city landmarks.', questions: [{ q: "Which is the largest continent?", a: ["Africa", "Asia", "Europe", "North America"], c: 1 }, { q: "What is the capital of Japan?", a: ["Seoul", "Beijing", "Tokyo", "Bangkok"], c: 2 }, { q: "Which river is the longest in the world?", a: ["Amazon", "Nile", "Yangtze", "Mississippi"], c: 1 }, { q: "Mount Everest is located in which mountain range?", a: ["Andes", "Rockies", "Alps", "Himalayas"], c: 3 }, { q: "Which country has the largest population?", a: ["USA", "India", "China", "Russia"], c: 1 }, { q: "Which ocean is the largest?", a: ["Atlantic", "Indian", "Arctic", "Pacific"], c: 3 }, { q: "What is the capital of France?", a: ["Lyon", "Marseille", "Paris", "Nice"], c: 2 }, { q: "Which country is also a continent?", a: ["Brazil", "Australia", "Canada", "India"], c: 1 }, { q: "The Sahara Desert is located in which continent?", a: ["Asia", "Africa", "South America", "Australia"], c: 1 }, { q: "Which city is known as the Big Apple?", a: ["Chicago", "Los Angeles", "New York", "London"], c: 2 }] },
+            { id: 'movies', title: 'Cinema Master', icon: '🎬', description: 'Lights, camera, and action! Movie trivia.', questions: [{ q: "Who directed 'Inception'?", a: ["Spielberg", "Nolan", "Tarantino", "Scorsese"], c: 1 }, { q: "Which movie won the first Academy Award?", a: ["Wings", "Sunrise", "The Racket", "7th Heaven"], c: 0 }, { q: "Highest-grossing film of all time?", a: ["Endgame", "Avatar", "Titanic", "Force Awakens"], c: 1 }, { q: "Who played Iron Man?", a: ["Evans", "Holland", "RDJ", "Pratt"], c: 2 }, { q: "Name of the hobbit in Lord of the Rings?", a: ["Sam", "Frodo", "Pippin", "Merry"], c: 1 }, { q: "Neo's pill color in Matrix?", a: ["Blue", "Red", "Green", "Yellow"], c: 1 }, { q: "Voice of Woody in Toy Story?", a: ["Allen", "Hanks", "Crystal", "Williams"], c: 1 }, { q: "Movie with 'Offer he can't refuse'?", a: ["Scarface", "Goodfellas", "Godfather", "Jaws"], c: 2 }, { q: "Kingdom in Frozen?", a: ["Arendelle", "Genovia", "Atlantica", "Wakanda"], c: 0 }, { q: "Jack Sparrow movie?", a: ["Peter Pan", "Pirates", "Hook", "Island"], c: 1 }] },
+            { id: 'music', title: 'Music Beats', icon: '🎵', description: 'From rock classics to modern pop hits.', questions: [{ q: "Who is the King of Pop?", a: ["Elvis", "Michael Jackson", "Prince", "Mercury"], c: 1 }, { q: "Band who sang 'Bohemian Rhapsody'?", a: ["Beatles", "Zeppelin", "Queen", "Pink Floyd"], c: 2 }, { q: "Strings on a guitar?", a: ["4", "5", "6", "7"], c: 2 }, { q: "Artist behind 'Rolling in the Deep'?", a: ["Adele", "Beyoncé", "Rihanna", "Gaga"], c: 0 }, { q: "Best-selling album ever?", a: ["Back in Black", "Thriller", "Dark Side", "Rumours"], c: 1 }, { q: "Instrument Mozart played?", a: ["Drums", "Flute", "Piano", "Trumpet"], c: 2 }, { q: "Lady Gaga's real name?", a: ["Stefani", "Robyn", "Katy", "Alecia"], c: 0 }, { q: "City where Beatles formed?", a: ["London", "Manchester", "Liverpool", "Birmingham"], c: 2 }, { q: "Lead singer of U2?", a: ["Sting", "Bono", "Jagger", "Bowie"], c: 1 }, { q: "Biggie Smalls genre?", a: ["Rock", "Jazz", "Hip Hop", "Country"], c: 2 }] },
+            { id: 'tech', title: 'Tech Wizard', icon: '💻', description: 'Computers, software, and digital frontier.', questions: [{ q: "Microsoft co-founder?", a: ["Jobs", "Musk", "Gates", "Zuck"], c: 2 }, { q: "What does URL stand for?", a: ["Resource Locator", "Radio Link", "Response Line", "Resource List"], c: 0 }, { q: "Company created iPhone?", a: ["Samsung", "Apple", "Google", "MS"], c: 1 }, { q: "Language for web styling?", a: ["HTML", "Python", "CSS", "Java"], c: 2 }, { q: "RAM stands for?", a: ["Random Access", "Read Any", "Rapid Area", "Real Active"], c: 0 }, { q: "Social media bird logo?", a: ["FB", "Insta", "Twitter", "Snap"], c: 2 }, { q: "Binary for number 2?", a: ["01", "10", "11", "00"], c: 1 }, { q: "CEO of Tesla?", a: ["Bezos", "Cook", "Musk", "Nadella"], c: 2 }, { q: "AI stands for?", a: ["Active Index", "Artificial Intel", "Auto Input", "Alpha"], c: 1 }, { q: "Google's browser?", a: ["Safari", "Firefox", "Edge", "Chrome"], c: 3 }] },
+            { id: 'sports', title: 'Sports Arena', icon: '⚽', description: 'Test your knowledge of athletes and games.', questions: [{ q: "Players on a soccer team?", a: ["9", "10", "11", "12"], c: 2 }, { q: "Most Grand Slams (Tennis)?", a: ["Federer", "Nadal", "Djokovic", "Serena"], c: 2 }, { q: "Sport with 'Slam Dunk'?", a: ["Baseball", "Tennis", "Basketball", "Golf"], c: 2 }, { q: "2022 World Cup winner?", a: ["France", "Brazil", "Argentina", "Germany"], c: 2 }, { q: "Marathon length (miles)?", a: ["26.2", "13.1", "20.0", "30.5"], c: 0 }, { q: "Boxing 'Greatest'?", a: ["Ali", "Tyson", "Frazier", "Mayweather"], c: 0 }, { q: "First modern Olympics city?", a: ["Paris", "Athens", "London", "Rome"], c: 1 }, { q: "Touchdown points (Football)?", a: ["3", "6", "7", "2"], c: 1 }, { q: "Dartboard center?", a: ["Eye", "Core", "Bullseye", "Point"], c: 2 }, { q: "Lightning Bolt athlete?", a: ["Usain Bolt", "Phelps", "Gay", "Blake"], c: 0 }] },
+            { id: 'literature', title: 'Book Worm', icon: '📚', description: 'Classic novels and famous authors.', questions: [{ q: "Who wrote Romeo & Juliet?", a: ["Dickens", "Twain", "Shakespeare", "Austen"], c: 2 }, { q: "First book of the Bible?", a: ["Exodus", "Genesis", "Leviticus", "Psalms"], c: 1 }, { q: "Sherlock Holmes creator?", a: ["Agatha", "Conan Doyle", "King", "Poe"], c: 1 }, { q: "The Great Gatsby author?", a: ["Hemingway", "Fitzgerald", "Steinbeck", "Faulkner"], c: 1 }, { q: "LOTR Wizard?", a: ["Dumbledore", "Merlin", "Gandalf", "Saruman"], c: 2 }, { q: "Who wrote Harry Potter?", a: ["Tolkien", "Lewis", "Rowling", "Dahl"], c: 2 }, { q: "First HP book title?", a: ["Chamber", "Stone", "Prisoner", "Goblet"], c: 1 }, { q: "1984 Leader?", a: ["Big Brother", "Napoleon", "Giver", "Snowball"], c: 0 }, { q: "Old Man and the Sea author?", a: ["Steinbeck", "Hemingway", "Tolstoy", "Kafka"], c: 1 }, { q: "The Odyssey author?", a: ["Socrates", "Plato", "Homer", "Aristotle"], c: 2 }] },
+            { id: 'food', title: 'Culinary King', icon: '🍕', description: 'Delicious trivia about food and drinks.', questions: [{ q: "Country invented Pizza?", a: ["France", "USA", "Italy", "Greece"], c: 2 }, { q: "Sushi main ingredient?", a: ["Fish", "Rice", "Seaweed", "Vinegar"], c: 1 }, { q: "King of Fruits?", a: ["Mango", "Apple", "Durian", "Banana"], c: 2 }, { q: "Hummus ingredient?", a: ["Lentils", "Chickpeas", "Beans", "Peas"], c: 1 }, { q: "Nut for Marzipan?", a: ["Peanut", "Walnut", "Almond", "Cashew"], c: 2 }, { q: "Spiciest chili?", a: ["Ghost", "Habanero", "Carolina", "Jalapeño"], c: 2 }, { q: "Nectar of the Gods?", a: ["Milk", "Wine", "Coffee", "Tea"], c: 1 }, { q: "Most consumed beverage?", a: ["Coffee", "Water", "Tea", "Beer"], c: 1 }, { q: "French fry vegetable?", a: ["Carrot", "Potato", "Onion", "Zucchini"], c: 1 }, { q: "Bread leavening agent?", a: ["Sugar", "Salt", "Yeast", "Soda"], c: 2 }] },
+            { id: 'art', title: 'Art Gallery', icon: '🎨', description: 'Masterpieces, painters, and creative history.', questions: [{ q: "Painted Mona Lisa?", a: ["Van Gogh", "Picasso", "Da Vinci", "Michelangelo"], c: 2 }, { q: "Artist cut off his ear?", a: ["Monet", "Van Gogh", "Dali", "Rembrandt"], c: 1 }, { q: " Michelangelo's famous man?", a: ["Thinker", "David", "Pieta", "Moses"], c: 1 }, { q: "Starry Night painter?", a: ["Van Gogh", "Monet", "Picasso", "Warhol"], c: 0 }, { q: "Dali's movement?", a: ["Impression", "Cubism", "Surrealism", "Pop"], c: 2 }, { q: "Blue + Yellow = ?", a: ["Purple", "Green", "Orange", "Brown"], c: 1 }, { q: "Last Supper painter?", a: ["Da Vinci", "Raphael", "Michel", "Botti"], c: 0 }, { q: "Louvre city?", a: ["London", "Rome", "Paris", "Madrid"], c: 2 }, { q: "Soup Cans artist?", a: ["Pollock", "Warhol", "Lichten", "Haring"], c: 1 }, { q: "Wet plaster painting?", a: ["Oil", "Acrylic", "Fresco", "Tempera"], c: 2 }] },
+            { id: 'space', title: 'Space Odyssey', icon: '🚀', description: 'Stars, galaxies, and the final frontier.', questions: [{ q: "Largest planet?", a: ["Earth", "Mars", "Jupiter", "Saturn"], c: 2 }, { q: "First on moon?", a: ["Yuri", "Buzz", "Neil", "John"], c: 2 }, { q: "Our galaxy name?", a: ["Andromeda", "Milky Way", "Sombrero", "Orion"], c: 1 }, { q: "Morning Star planet?", a: ["Mars", "Venus", "Mercury", "Jupiter"], c: 1 }, { q: "Sun's primary element?", a: ["Helium", "Hydrogen", "Oxygen", "Iron"], c: 1 }, { q: "Planets in solar system?", a: ["7", "8", "9", "10"], c: 1 }, { q: "Closest to sun?", a: ["Venus", "Mars", "Mercury", "Earth"], c: 2 }, { q: "Black hole cause?", a: ["Supernova", "Collapse", "Alien", "Big Bang"], c: 1 }, { q: "Planet with rings?", a: ["Mars", "Jupiter", "Saturn", "Neptune"], c: 2 }, { q: "First satellite?", a: ["Apollo", "Voyager", "Sputnik", "Hubble"], c: 2 }] },
+            { id: 'animals', title: 'Animal Kingdom', icon: '🐘', description: 'Wildlife and nature trivia.', questions: [{ q: "Fastest land animal?", a: ["Lion", "Cheetah", "Gazelle", "Horse"], c: 1 }, { q: "Spider legs?", a: ["6", "8", "10", "12"], c: 1 }, { q: "Largest mammal?", a: ["Elephant", "Blue Whale", "Giraffe", "Shark"], c: 1 }, { q: "Bird cannot fly?", a: ["Eagle", "Parrot", "Ostrich", "Hawk"], c: 2 }, { q: "Lions group?", a: ["Pack", "Herd", "Pride", "Flock"], c: 2 }, { q: "Octopus hearts?", a: ["1", "2", "3", "4"], c: 2 }, { q: "Only flying mammal?", a: ["Bat", "Squirrel", "Eagle", "Owl"], c: 0 }, { q: "Ship of the Desert?", a: ["Horse", "Camel", "Elephant", "Donkey"], c: 1 }, { q: "Baby kangaroo name?", a: ["Joey", "Cub", "Calf", "Pup"], c: 0 }, { q: "Penguin home?", a: ["Arctic", "Antarctica", "Africa", "Australia"], c: 1 }] },
+            { id: 'mythology', title: 'Myth & Legend', icon: '🔱', description: 'Gods, monsters, and ancient stories.', questions: [{ q: "King of Greek Gods?", a: ["Hades", "Poseidon", "Zeus", "Apollo"], c: 2 }, { q: "Thor's hammer?", a: ["Excalibur", "Mjolnir", "Aegis", "Gungnir"], c: 1 }, { q: "Flew too close to sun?", a: ["Icarus", "Hercules", "Achilles", "Perseus"], c: 0 }, { q: "Brave warriors go to?", a: ["Hades", "Valhalla", "Olympus", "Atlantis"], c: 1 }, { q: "Half-man half-bull?", a: ["Centaur", "Minotaur", "Satyr", "Griffin"], c: 1 }, { q: "Snakes for hair?", a: ["Medusa", "Circe", "Athena", "Hera"], c: 0 }, { q: "Wings on sandals god?", a: ["Ares", "Hermes", "Dionysus", "Hepha"], c: 1 }, { q: "Three-headed dog?", a: ["Hydra", "Chimera", "Cerberus", "Fenrir"], c: 2 }, { q: "Goddess of love?", a: ["Artemis", "Aphrodite", "Hestia", "Demeter"], c: 1 }, { q: "Sunken city?", a: ["El Dorado", "Camelot", "Atlantis", "Pompeii"], c: 2 }] },
+            { id: 'business', title: 'Market Mogul', icon: '💼', description: 'Finance, brands, and billionaires.', questions: [{ q: "Largest retailer?", a: ["Amazon", "Walmart", "Target", "Costco"], c: 1 }, { q: "Amazon founder?", a: ["Bezos", "Gates", "Jack Ma", "Buffett"], c: 0 }, { q: "Japan currency?", a: ["Yuan", "Won", "Yen", "Baht"], c: 2 }, { q: "Swoosh logo brand?", a: ["Adidas", "Nike", "Puma", "Reebok"], c: 1 }, { q: "CEO stands for?", a: ["Exec Officer", "Energy Officer", "Engine Op", "Exec Org"], c: 0 }, { q: "Largest economy?", a: ["China", "Germany", "USA", "Japan"], c: 2 }, { q: "Oracle of Omaha?", a: ["Gates", "Buffett", "Musk", "Jobs"], c: 1 }, { q: "Model T producer?", a: ["Ford", "GM", "Toyota", "Ferrari"], c: 0 }, { q: "Apple stock ticker?", a: ["APLE", "APP", "AAPL", "APL"], c: 2 }, { q: "US Financial capital?", a: ["Chicago", "Washington", "New York", "SF"], c: 2 }] }
+        ];
+
+        const ITEMS_PER_PAGE = 12;
+        let currentPage = 1;
+        let totalPoints = 0;
+        let currentQuiz = null;
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+
+        function renderLobby() {
+            const lobby = document.getElementById('lobby');
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+            const pageItems = quizData.slice(startIndex, endIndex);
+
+            lobby.innerHTML = pageItems.map(quiz => `
+                <div onclick="startQuiz('${quiz.id}')" class="glass-card p-6 cursor-pointer hover:border-indigo-500/50 hover:bg-white/5 transition group flex flex-col h-full">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition duration-300">${quiz.icon}</div>
+                    <h3 class="text-xl font-bold mb-2">${quiz.title}</h3>
+                    <p class="text-slate-400 text-sm mb-4 flex-grow">${quiz.description}</p>
+                    <div class="flex items-center text-indigo-400 font-semibold text-sm">
+                        Start Session 
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 group-hover:translate-x-1 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </div>
+            `).join('');
+
+            updatePagination();
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(quizData.length / ITEMS_PER_PAGE);
+            document.getElementById('page-indicator').innerText = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById('page-prev').disabled = currentPage === 1;
+            document.getElementById('page-next-nav').disabled = currentPage === totalPages;
+
+            const pageNumbers = document.getElementById('page-numbers');
+            pageNumbers.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.innerHTML += `
+                    <button onclick="goToPage(${i})" class="h-10 w-10 flex items-center justify-center rounded-xl glass-card transition ${currentPage === i ? 'bg-indigo-500 text-white border-indigo-500' : 'hover:bg-white/10'}">
+                        ${i}
+                    </button>
+                `;
+            }
+        }
+
+        function changePage(delta) {
+            currentPage += delta;
+            renderLobby();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderLobby();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showLobby() {
+            document.getElementById('lobby-section').classList.remove('hidden');
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('results-screen').classList.add('hidden');
+            currentQuiz = null;
+        }
+
+        function startQuiz(quizId) {
+            currentQuiz = quizData.find(q => q.id === quizId);
+            currentQuestionIndex = 0;
+            userAnswers = new Array(currentQuiz.questions.length).fill(null);
+            
+            document.getElementById('lobby-section').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('results-screen').classList.add('hidden');
+            
+            renderQuestion();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderQuestion() {
+            const question = currentQuiz.questions[currentQuestionIndex];
+            document.getElementById('question-title').innerText = question.q;
+            document.getElementById('progress-text').innerText = `Question ${currentQuestionIndex + 1} of ${currentQuiz.questions.length}`;
+            
+            const optionsGrid = document.getElementById('options-grid');
+            optionsGrid.innerHTML = question.a.map((opt, idx) => `
+                <button 
+                    onclick="selectOption(${idx})" 
+                    class="option-btn w-full text-left p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 ${userAnswers[currentQuestionIndex] === idx ? 'selected' : ''}"
+                >
+                    <span class="inline-block w-8 text-slate-500 font-bold">${String.fromCharCode(65 + idx)}</span>
+                    ${opt}
+                </button>
+            `).join('');
+
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.innerText = currentQuestionIndex === currentQuiz.questions.length - 1 ? "Submit Quiz" : "Next";
+            
+            const prevBtn = document.getElementById('prev-btn');
+            if (currentQuestionIndex > 0) prevBtn.classList.remove('hidden');
+            else prevBtn.classList.add('hidden');
+
+            const dots = document.getElementById('pagination-dots');
+            dots.innerHTML = currentQuiz.questions.map((_, i) => `
+                <div class="h-1.5 w-6 rounded-full transition-colors duration-300 ${i === currentQuestionIndex ? 'bg-indigo-500' : (userAnswers[i] !== null ? 'bg-slate-600' : 'bg-white/10')}"></div>
+            `).join('');
+        }
+
+        function selectOption(index) {
+            userAnswers[currentQuestionIndex] = index;
+            renderQuestion();
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (userAnswers[currentQuestionIndex] === null) return;
+            if (currentQuestionIndex < currentQuiz.questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            let score = 0;
+            const reviewList = document.getElementById('review-list');
+            reviewList.innerHTML = '';
+
+            currentQuiz.questions.forEach((q, idx) => {
+                const isCorrect = userAnswers[idx] === q.c;
+                if (isCorrect) score++;
+                reviewList.innerHTML += `
+                    <div class="p-4 rounded-xl border ${isCorrect ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-red-500/30 bg-red-500/5'}">
+                        <p class="font-bold mb-3">${idx + 1}. ${q.q}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                            <div class="${isCorrect ? 'text-emerald-400' : 'text-red-400'}">
+                                <span class="text-slate-500 mr-2">Your Answer:</span> ${q.a[userAnswers[idx]]}
+                                ${isCorrect ? ' ✓' : ' ✗'}
+                            </div>
+                            ${!isCorrect ? `<div class="text-emerald-400"><span class="text-slate-500 mr-2">Correct:</span> ${q.a[q.c]}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            totalPoints += (score * 10);
+            document.getElementById('global-score-nav').innerText = `${totalPoints} pts`;
+            document.getElementById('final-score').innerText = `${score}/${currentQuiz.questions.length}`;
+            document.getElementById('percentage').innerText = `${Math.round((score / currentQuiz.questions.length) * 100)}%`;
+            document.getElementById('result-category').innerText = currentQuiz.title;
+
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('results-screen').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.onload = renderLobby;
+    </script>
+</body>
+</html>
