@@ -1,423 +1,829 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZG8P2XCTBW"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-ZG8P2XCTBW');
-</script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuestMaster | Premium Quiz Gaming</title>
+    <title>Nexus | Premium 3D Quiz Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
     <style>
+        /* ========== ALL ORIGINAL STYLES PRESERVED ========== */
+        :root {
+            --glass-bg: rgba(20, 25, 40, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shine: rgba(255, 255, 255, 0.05);
+            --primary-glow: #4f46e5;
+            --secondary-glow: #ec4899;
+        }
+
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
-            color: #f8fafc;
+            font-family: 'Outfit', sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+            margin: 0;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
-        .glass-card {
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
+        h1, h2, h3, .brand-font {
+            font-family: 'Space Grotesk', sans-serif;
         }
 
-        .option-btn {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at 50% 50%, #111827 0%, #000000 100%);
         }
 
-        .option-btn.selected {
-            background: #6366f1;
-            border-color: #818cf8;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
-            transform: scale(1.02);
+        .ambient-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            animation: floatGlow 10s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+        .glow-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: rgba(79, 70, 229, 0.15); }
+        .glow-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: rgba(236, 72, 153, 0.15); }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
         }
 
-        .gradient-text {
-            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255,255,255,0.1);
         }
 
-        .nav-link {
+        .tilt-wrapper {
+            perspective: 1500px;
+            transform-style: preserve-3d;
+        }
+
+        .tilt-card {
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.2s;
+            transform-style: preserve-3d;
             position: relative;
-            transition: color 0.3s ease;
         }
-        .nav-link::after {
+
+        .tilt-card::before {
             content: '';
             position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: #6366f1;
-            transition: width 0.3s ease;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            transform: translateZ(1px);
         }
-        .nav-link:hover::after {
-            width: 100%;
+
+        .tilt-card:hover::before {
+            opacity: 1;
         }
+
+        .float-element {
+            transform: translateZ(40px);
+            transition: transform 0.3s;
+        }
+        
+        .tilt-card:hover .float-element {
+            transform: translateZ(70px) scale(1.05);
+        }
+
+        .quiz-option input:checked + div {
+            background: rgba(79, 70, 229, 0.3);
+            border-color: #6366f1;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+            transform: scale(1.02) translateZ(20px);
+        }
+
+        .option-correct {
+            background: rgba(34, 197, 94, 0.2) !important;
+            border-color: #22c55e !important;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.3) !important;
+        }
+        .option-wrong {
+            background: rgba(239, 68, 68, 0.2) !important;
+            border-color: #ef4444 !important;
+        }
+
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .slide-up { animation: slideUp 0.5s ease-out forwards; opacity: 0; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .animate-fade {
-            animation: fadeIn 0.4s ease-out forwards;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) translateZ(-50px); }
+            to { opacity: 1; transform: translateY(0) translateZ(0); }
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, #4f46e5 0%, #ec4899 100%);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .btn-premium::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 100%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .btn-premium:hover::after { opacity: 1; }
+        .btn-premium:hover {
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            max-width: 400px;
+            width: 90%;
         }
     </style>
 </head>
-<body class="p-0 m-0">
+<body>
 
-    <!-- Premium Navigation Bar -->
-    <nav class="sticky top-0 z-50 glass-card !rounded-none border-b border-white/5 px-6 py-4 mb-8">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-8">
-                <h1 onclick="showLobby()" class="text-2xl font-extrabold tracking-tight cursor-pointer">QUEST<span class="gradient-text">MASTER</span></h1>
-                <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
-                    <a href="#" onclick="showLobby()" class="nav-link hover:text-white">Lobby</a>
-                    <a href="#" class="nav-link hover:text-white">Leaderboards</a>
-                    <a href="#" class="nav-link hover:text-white">Achievements</a>
+    <!-- 3D Environment -->
+    <canvas id="bg-canvas"></canvas>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-panel border-b-0 border-white/5">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="app.navigate('home')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-pink-500 flex items-center justify-center shadow-lg group-hover:shadow-pink-500/50 transition-all">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 </div>
+                <span class="text-2xl font-bold brand-font tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">NEXUS</span>
             </div>
+            
             <div class="flex items-center gap-4">
-                <div class="glass-card px-4 py-2 flex items-center gap-2 text-sm bg-white/5">
-                    <span class="text-yellow-400">🏆</span>
-                    <span id="global-score-nav" class="font-bold">0 pts</span>
+                <!-- Scoreboard Button -->
+                <button id="scoreboardBtn" class="hidden md:flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-all text-sm font-semibold" onclick="showScoreboard()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <span id="totalScoreDisplay">0</span>
+                </button>
+
+                <!-- Profile Area -->
+                <div id="profileArea" class="hidden md:flex items-center gap-3 cursor-pointer group relative" onclick="showProfile()">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-pink-500 flex items-center justify-center shadow-lg">
+                        <span id="profileInitial" class="text-white font-bold text-lg">U</span>
+                    </div>
+                    <span id="usernameDisplay" class="text-white font-medium">Guest</span>
                 </div>
-                <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center border-2 border-white/20">
-                    <span class="text-xs font-bold">JD</span>
-                </div>
+
+                <!-- Login/Signup Button (shown when logged out) -->
+                <button id="loginBtn" class="btn-premium px-5 py-2 rounded-xl text-sm font-bold" onclick="showLoginModal()">Login / Signup</button>
+            </div>
+
+            <div id="breadcrumbs" class="hidden md:flex items-center gap-2 text-sm text-gray-400 font-medium">
+                <!-- Breadcrumbs injected via JS -->
             </div>
         </div>
     </nav>
 
     <!-- Main Content Area -->
-    <main id="app" class="max-w-7xl mx-auto px-6 flex-grow w-full pb-20">
-        
-        <!-- Lobby Section -->
-        <div id="lobby-section">
-            <div class="flex justify-between items-end mb-8 animate-fade">
-                <div>
-                    <h2 class="text-3xl font-bold mb-1">Game Center</h2>
-                    <p class="text-slate-400">Select a category and start your journey</p>
-                </div>
-                <div class="text-sm text-slate-500 font-medium" id="page-indicator">Page 1 of 2</div>
-            </div>
-
-            <!-- Game Grid -->
-            <div id="lobby" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade">
-                <!-- 12 Cards will be injected here per page -->
-            </div>
-
-            <!-- Premium Pagination -->
-            <div class="mt-12 flex justify-center items-center gap-4 animate-fade">
-                <button id="page-prev" onclick="changePage(-1)" class="glass-card px-6 py-3 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition font-bold">
-                    Previous
-                </button>
-                <div id="page-numbers" class="flex gap-2">
-                    <!-- Page numbers injected here -->
-                </div>
-                <button id="page-next-nav" onclick="changePage(1)" class="glass-card px-6 py-3 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition font-bold">
-                    Next
-                </button>
-            </div>
-        </div>
-
-        <!-- Quiz Play Screen (unchanged logic, updated layout) -->
-        <div id="quiz-screen" class="hidden animate-fade max-w-4xl mx-auto">
-            <div class="glass-card p-6 md:p-10">
-                <div class="flex justify-between items-center mb-8">
-                    <button onclick="showLobby()" class="text-slate-400 hover:text-white flex items-center gap-2 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-                        </svg>
-                        Exit Game
-                    </button>
-                    <div class="text-sm font-semibold text-indigo-400" id="progress-text">Question 1 of 10</div>
-                </div>
-
-                <div id="question-area">
-                    <h2 id="question-title" class="text-2xl font-bold mb-8 leading-snug">Loading Question...</h2>
-                    <div id="options-grid" class="grid grid-cols-1 gap-4">
-                        <!-- Options injected here -->
-                    </div>
-                </div>
-
-                <div class="mt-10 flex flex-col sm:flex-row justify-between items-center border-t border-white/10 pt-8 gap-4">
-                    <div class="flex gap-2 items-center" id="pagination-dots">
-                        <!-- Dots injected here -->
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <button id="prev-btn" onclick="prevQuestion()" class="hidden border border-white/10 hover:bg-white/5 px-6 py-3 rounded-xl font-bold transition text-slate-300">
-                            Previous
-                        </button>
-                        <button id="next-btn" onclick="nextQuestion()" class="bg-indigo-600 hover:bg-indigo-500 px-8 py-3 rounded-xl font-bold transition shadow-lg shadow-indigo-500/20">
-                            Next
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Results Screen -->
-        <div id="results-screen" class="hidden animate-fade max-w-4xl mx-auto">
-            <div class="glass-card p-8 md:p-12 text-center mb-8">
-                <div class="text-6xl mb-4">🎉</div>
-                <h2 class="text-4xl font-extrabold mb-2">Quiz Complete!</h2>
-                <p class="text-slate-400 mb-6" id="result-category">Category Name</p>
-                <div class="flex justify-center gap-8 mb-8">
-                    <div class="text-center">
-                        <p class="text-3xl font-bold text-indigo-400" id="final-score">0/10</p>
-                        <p class="text-xs uppercase tracking-widest text-slate-500">Correct</p>
-                    </div>
-                    <div class="text-center border-l border-white/10 pl-8">
-                        <p class="text-3xl font-bold text-purple-400" id="percentage">0%</p>
-                        <p class="text-xs uppercase tracking-widest text-slate-500">Accuracy</p>
-                    </div>
-                </div>
-                <button onclick="showLobby()" class="bg-white text-indigo-950 px-10 py-3 rounded-xl font-bold hover:bg-indigo-50 transition">
-                    Back to Lobby
-                </button>
-            </div>
-            <div class="glass-card p-6 md:p-8">
-                <h3 class="text-xl font-bold mb-6">Review Answers</h3>
-                <div id="review-list" class="space-y-6"></div>
-            </div>
-        </div>
+    <main id="app-container" class="pt-32 pb-20 px-6 max-w-7xl mx-auto min-h-screen flex flex-col">
+        <!-- Dynamic Content Injected Here -->
     </main>
 
-    <!-- Page Footer -->
-    <footer class="bg-slate-900/50 border-t border-white/5 py-12 px-6">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div class="col-span-1 md:col-span-2">
-                <h3 class="text-xl font-bold mb-4">QUEST<span class="gradient-text">MASTER</span></h3>
-                <p class="text-slate-400 max-w-md mb-6">The world's premier platform for intellectual challenges and trivia gaming. Compete, learn, and master your favorite subjects with our hand-curated quiz experiences.</p>
-                <div class="flex gap-4">
-                    <div class="h-10 w-10 rounded-lg glass-card flex items-center justify-center hover:bg-indigo-500 transition cursor-pointer">𝕏</div>
-                    <div class="h-10 w-10 rounded-lg glass-card flex items-center justify-center hover:bg-indigo-500 transition cursor-pointer">IG</div>
-                    <div class="h-10 w-10 rounded-lg glass-card flex items-center justify-center hover:bg-indigo-500 transition cursor-pointer">YT</div>
-                </div>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content glass-panel rounded-2xl p-8 relative">
+            <button onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">&times;</button>
+            <h2 class="text-2xl font-bold mb-6">Login</h2>
+            <input type="email" id="loginEmail" placeholder="Email" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 mb-4 text-white">
+            <input type="password" id="loginPassword" placeholder="Password" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 mb-6 text-white">
+            <button onclick="login()" class="btn-premium w-full py-3 rounded-xl font-bold mb-3">Login</button>
+            <p class="text-center text-gray-400">Don't have an account? <button onclick="switchToSignup()" class="text-indigo-400 hover:text-indigo-300">Sign up</button></p>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content glass-panel rounded-2xl p-8 relative">
+            <button onclick="closeModal('signupModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">&times;</button>
+            <h2 class="text-2xl font-bold mb-6">Sign Up</h2>
+            <input type="text" id="signupUsername" placeholder="Username" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 mb-4 text-white">
+            <input type="email" id="signupEmail" placeholder="Email" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 mb-4 text-white">
+            <input type="password" id="signupPassword" placeholder="Password" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 mb-6 text-white">
+            <button onclick="signup()" class="btn-premium w-full py-3 rounded-xl font-bold mb-3">Sign Up</button>
+            <p class="text-center text-gray-400">Already have an account? <button onclick="switchToLogin()" class="text-indigo-400 hover:text-indigo-300">Login</button></p>
+        </div>
+    </div>
+
+    <!-- Scoreboard Modal -->
+    <div id="scoreboardModal" class="modal">
+        <div class="modal-content glass-panel rounded-2xl p-8 max-w-2xl w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Scoreboard</h2>
+                <button onclick="closeModal('scoreboardModal')" class="text-gray-400 hover:text-white">&times;</button>
             </div>
-            <div>
-                <h4 class="font-bold mb-4 text-white">Platform</h4>
-                <ul class="text-slate-400 space-y-2 text-sm">
-                    <li><a href="#" class="hover:text-indigo-400">Categories</a></li>
-                    <li><a href="#" class="hover:text-indigo-400">Daily Challenge</a></li>
-                    <li><a href="#" class="hover:text-indigo-400">Pro Features</a></li>
-                    <li><a href="#" class="hover:text-indigo-400">Leaderboard</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-bold mb-4 text-white">Support</h4>
-                <ul class="text-slate-400 space-y-2 text-sm">
-                    <li><a href="#" class="hover:text-indigo-400">Help Center</a></li>
-                    <li><a href="#" class="hover:text-indigo-400">Terms of Service</a></li>
-                    <li><a href="#" class="hover:text-indigo-400">Privacy Policy</a></li>
-                    <li><a href="#" class="hover:text-indigo-400">Contact Us</a></li>
-                </ul>
+            <div id="scoreboardList" class="max-h-96 overflow-y-auto space-y-3">
+                <p class="text-gray-400 text-center">Loading...</p>
             </div>
         </div>
-        <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/5 text-center text-slate-500 text-sm">
-            © 2024 QuestMaster Premium Quiz Hub. All rights reserved. Made for Masterminds.
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content glass-panel rounded-2xl p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Profile</h2>
+                <button onclick="closeModal('profileModal')" class="text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <div id="profileInfo" class="space-y-4">
+                <!-- Profile data injected -->
+            </div>
+            <button onclick="logout()" class="btn-premium w-full mt-6 py-3 rounded-xl font-bold">Logout</button>
         </div>
-    </footer>
+    </div>
 
     <script>
-        // Content remains identical but expanded to show pagination (15 categories total)
-        const quizData = [
-            { id: 'science', title: 'Quantum Science', icon: '🔬', description: 'Test your knowledge on physics and biology.', questions: [{ q: "What is the chemical symbol for Gold?", a: ["Gd", "Au", "Ag", "Pb"], c: 1 }, { q: "Which planet is known as the Red Planet?", a: ["Venus", "Jupiter", "Mars", "Saturn"], c: 2 }, { q: "What is the power house of the cell?", a: ["Nucleus", "Ribosome", "Mitochondria", "Vacuole"], c: 2 }, { q: "Which gas do plants primarily absorb?", a: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], c: 1 }, { q: "What is the boiling point of water at sea level?", a: ["90°C", "110°C", "100°C", "120°C"], c: 2 }, { q: "Who developed the theory of relativity?", a: ["Newton", "Einstein", "Tesla", "Curie"], c: 1 }, { q: "What is the hardest natural substance?", a: ["Gold", "Iron", "Diamond", "Quartz"], c: 2 }, { q: "How many bones are in the adult human body?", a: ["206", "180", "212", "250"], c: 0 }, { q: "Which part of the brain controls balance?", a: ["Cerebrum", "Cerebellum", "Brainstem", "Thalamus"], c: 1 }, { q: "What speed does light travel approximately?", a: ["300,000 km/s", "150,000 km/s", "500,000 km/s", "1,000,000 km/s"], c: 0 }] },
-            { id: 'gaming', title: 'Pro Gaming', icon: '🎮', description: 'For the ultimate fans of pixel and polygon.', questions: [{ q: "Which game features 'Master Chief'?", a: ["Doom", "Halo", "Mass Effect", "Metroid"], c: 1 }, { q: "What year was the original PlayStation released in Japan?", a: ["1992", "1994", "1996", "1998"], c: 1 }, { q: "Which plumber is Mario's brother?", a: ["Wario", "Walugi", "Luigi", "Yoshi"], c: 2 }, { q: "In Minecraft, what do you need to make a portal to the Nether?", a: ["Cobblestone", "Obsidian", "Diamond", "Bedrock"], c: 1 }, { q: "Which game company created 'Zelda'?", a: ["Sega", "Sony", "Nintendo", "Ubisoft"], c: 2 }, { q: "What is the best-selling video game of all time?", a: ["Tetris", "GTA V", "Minecraft", "Wii Sports"], c: 2 }, { q: "What is the name of the kingdom in Super Mario Odyssey?", a: ["Mushroom", "Cloud", "Metro", "Sand"], c: 0 }, { q: "Which MOBA features a map called Summoner's Rift?", a: ["Dota 2", "Smite", "League of Legends", "Heroes of the Storm"], c: 2 }, { q: "Who is the protagonist of 'The Witcher' series?", a: ["Geralt", "Ciri", "Vesemir", "Lambert"], c: 0 }, { q: "What does 'FPS' stand for in gaming?", a: ["Fast Pace Shooter", "First Person Shooter", "Final Point System", "Front Plane Speed"], c: 1 }] },
-            { id: 'history', title: 'World History', icon: '🏛️', description: 'Journey through the timeline of humanity.', questions: [{ q: "Who was the first President of the United States?", a: ["Jefferson", "Lincoln", "Washington", "Adams"], c: 2 }, { q: "In which year did World War II end?", a: ["1943", "1944", "1945", "1946"], c: 2 }, { q: "Which empire built the Colosseum?", a: ["Greek", "Roman", "Persian", "Egyptian"], c: 1 }, { q: "Who discovered America in 1492?", a: ["Vasco da Gama", "Magellan", "Columbus", "Cook"], c: 2 }, { q: "The Great Wall of China was built to keep out which group?", a: ["Mongols", "Romans", "Vikings", "Persians"], c: 0 }, { q: "Who was the 'Maid of Orleans'?", a: ["Joan of Arc", "Marie Antoinette", "Catherine the Great", "Elizabeth I"], c: 0 }, { q: "What was the capital of the Byzantine Empire?", a: ["Rome", "Athens", "Constantinople", "Cairo"], c: 2 }, { q: "The Renaissance began in which country?", a: ["France", "Spain", "Italy", "Germany"], c: 2 }, { q: "Who was the leader of the Soviet Union during WWII?", a: ["Lenin", "Stalin", "Khrushchev", "Gorbachev"], c: 1 }, { q: "Which ancient civilization built the pyramids?", a: ["Maya", "Aztec", "Inca", "Egyptian"], c: 3 }] },
-            { id: 'geography', title: 'Exploration', icon: '🌍', description: 'Continents, oceans, and city landmarks.', questions: [{ q: "Which is the largest continent?", a: ["Africa", "Asia", "Europe", "North America"], c: 1 }, { q: "What is the capital of Japan?", a: ["Seoul", "Beijing", "Tokyo", "Bangkok"], c: 2 }, { q: "Which river is the longest in the world?", a: ["Amazon", "Nile", "Yangtze", "Mississippi"], c: 1 }, { q: "Mount Everest is located in which mountain range?", a: ["Andes", "Rockies", "Alps", "Himalayas"], c: 3 }, { q: "Which country has the largest population?", a: ["USA", "India", "China", "Russia"], c: 1 }, { q: "Which ocean is the largest?", a: ["Atlantic", "Indian", "Arctic", "Pacific"], c: 3 }, { q: "What is the capital of France?", a: ["Lyon", "Marseille", "Paris", "Nice"], c: 2 }, { q: "Which country is also a continent?", a: ["Brazil", "Australia", "Canada", "India"], c: 1 }, { q: "The Sahara Desert is located in which continent?", a: ["Asia", "Africa", "South America", "Australia"], c: 1 }, { q: "Which city is known as the Big Apple?", a: ["Chicago", "Los Angeles", "New York", "London"], c: 2 }] },
-            { id: 'movies', title: 'Cinema Master', icon: '🎬', description: 'Lights, camera, and action! Movie trivia.', questions: [{ q: "Who directed 'Inception'?", a: ["Spielberg", "Nolan", "Tarantino", "Scorsese"], c: 1 }, { q: "Which movie won the first Academy Award?", a: ["Wings", "Sunrise", "The Racket", "7th Heaven"], c: 0 }, { q: "Highest-grossing film of all time?", a: ["Endgame", "Avatar", "Titanic", "Force Awakens"], c: 1 }, { q: "Who played Iron Man?", a: ["Evans", "Holland", "RDJ", "Pratt"], c: 2 }, { q: "Name of the hobbit in Lord of the Rings?", a: ["Sam", "Frodo", "Pippin", "Merry"], c: 1 }, { q: "Neo's pill color in Matrix?", a: ["Blue", "Red", "Green", "Yellow"], c: 1 }, { q: "Voice of Woody in Toy Story?", a: ["Allen", "Hanks", "Crystal", "Williams"], c: 1 }, { q: "Movie with 'Offer he can't refuse'?", a: ["Scarface", "Goodfellas", "Godfather", "Jaws"], c: 2 }, { q: "Kingdom in Frozen?", a: ["Arendelle", "Genovia", "Atlantica", "Wakanda"], c: 0 }, { q: "Jack Sparrow movie?", a: ["Peter Pan", "Pirates", "Hook", "Island"], c: 1 }] },
-            { id: 'music', title: 'Music Beats', icon: '🎵', description: 'From rock classics to modern pop hits.', questions: [{ q: "Who is the King of Pop?", a: ["Elvis", "Michael Jackson", "Prince", "Mercury"], c: 1 }, { q: "Band who sang 'Bohemian Rhapsody'?", a: ["Beatles", "Zeppelin", "Queen", "Pink Floyd"], c: 2 }, { q: "Strings on a guitar?", a: ["4", "5", "6", "7"], c: 2 }, { q: "Artist behind 'Rolling in the Deep'?", a: ["Adele", "Beyoncé", "Rihanna", "Gaga"], c: 0 }, { q: "Best-selling album ever?", a: ["Back in Black", "Thriller", "Dark Side", "Rumours"], c: 1 }, { q: "Instrument Mozart played?", a: ["Drums", "Flute", "Piano", "Trumpet"], c: 2 }, { q: "Lady Gaga's real name?", a: ["Stefani", "Robyn", "Katy", "Alecia"], c: 0 }, { q: "City where Beatles formed?", a: ["London", "Manchester", "Liverpool", "Birmingham"], c: 2 }, { q: "Lead singer of U2?", a: ["Sting", "Bono", "Jagger", "Bowie"], c: 1 }, { q: "Biggie Smalls genre?", a: ["Rock", "Jazz", "Hip Hop", "Country"], c: 2 }] },
-            { id: 'tech', title: 'Tech Wizard', icon: '💻', description: 'Computers, software, and digital frontier.', questions: [{ q: "Microsoft co-founder?", a: ["Jobs", "Musk", "Gates", "Zuck"], c: 2 }, { q: "What does URL stand for?", a: ["Resource Locator", "Radio Link", "Response Line", "Resource List"], c: 0 }, { q: "Company created iPhone?", a: ["Samsung", "Apple", "Google", "MS"], c: 1 }, { q: "Language for web styling?", a: ["HTML", "Python", "CSS", "Java"], c: 2 }, { q: "RAM stands for?", a: ["Random Access", "Read Any", "Rapid Area", "Real Active"], c: 0 }, { q: "Social media bird logo?", a: ["FB", "Insta", "Twitter", "Snap"], c: 2 }, { q: "Binary for number 2?", a: ["01", "10", "11", "00"], c: 1 }, { q: "CEO of Tesla?", a: ["Bezos", "Cook", "Musk", "Nadella"], c: 2 }, { q: "AI stands for?", a: ["Active Index", "Artificial Intel", "Auto Input", "Alpha"], c: 1 }, { q: "Google's browser?", a: ["Safari", "Firefox", "Edge", "Chrome"], c: 3 }] },
-            { id: 'sports', title: 'Sports Arena', icon: '⚽', description: 'Test your knowledge of athletes and games.', questions: [{ q: "Players on a soccer team?", a: ["9", "10", "11", "12"], c: 2 }, { q: "Most Grand Slams (Tennis)?", a: ["Federer", "Nadal", "Djokovic", "Serena"], c: 2 }, { q: "Sport with 'Slam Dunk'?", a: ["Baseball", "Tennis", "Basketball", "Golf"], c: 2 }, { q: "2022 World Cup winner?", a: ["France", "Brazil", "Argentina", "Germany"], c: 2 }, { q: "Marathon length (miles)?", a: ["26.2", "13.1", "20.0", "30.5"], c: 0 }, { q: "Boxing 'Greatest'?", a: ["Ali", "Tyson", "Frazier", "Mayweather"], c: 0 }, { q: "First modern Olympics city?", a: ["Paris", "Athens", "London", "Rome"], c: 1 }, { q: "Touchdown points (Football)?", a: ["3", "6", "7", "2"], c: 1 }, { q: "Dartboard center?", a: ["Eye", "Core", "Bullseye", "Point"], c: 2 }, { q: "Lightning Bolt athlete?", a: ["Usain Bolt", "Phelps", "Gay", "Blake"], c: 0 }] },
-            { id: 'literature', title: 'Book Worm', icon: '📚', description: 'Classic novels and famous authors.', questions: [{ q: "Who wrote Romeo & Juliet?", a: ["Dickens", "Twain", "Shakespeare", "Austen"], c: 2 }, { q: "First book of the Bible?", a: ["Exodus", "Genesis", "Leviticus", "Psalms"], c: 1 }, { q: "Sherlock Holmes creator?", a: ["Agatha", "Conan Doyle", "King", "Poe"], c: 1 }, { q: "The Great Gatsby author?", a: ["Hemingway", "Fitzgerald", "Steinbeck", "Faulkner"], c: 1 }, { q: "LOTR Wizard?", a: ["Dumbledore", "Merlin", "Gandalf", "Saruman"], c: 2 }, { q: "Who wrote Harry Potter?", a: ["Tolkien", "Lewis", "Rowling", "Dahl"], c: 2 }, { q: "First HP book title?", a: ["Chamber", "Stone", "Prisoner", "Goblet"], c: 1 }, { q: "1984 Leader?", a: ["Big Brother", "Napoleon", "Giver", "Snowball"], c: 0 }, { q: "Old Man and the Sea author?", a: ["Steinbeck", "Hemingway", "Tolstoy", "Kafka"], c: 1 }, { q: "The Odyssey author?", a: ["Socrates", "Plato", "Homer", "Aristotle"], c: 2 }] },
-            { id: 'food', title: 'Culinary King', icon: '🍕', description: 'Delicious trivia about food and drinks.', questions: [{ q: "Country invented Pizza?", a: ["France", "USA", "Italy", "Greece"], c: 2 }, { q: "Sushi main ingredient?", a: ["Fish", "Rice", "Seaweed", "Vinegar"], c: 1 }, { q: "King of Fruits?", a: ["Mango", "Apple", "Durian", "Banana"], c: 2 }, { q: "Hummus ingredient?", a: ["Lentils", "Chickpeas", "Beans", "Peas"], c: 1 }, { q: "Nut for Marzipan?", a: ["Peanut", "Walnut", "Almond", "Cashew"], c: 2 }, { q: "Spiciest chili?", a: ["Ghost", "Habanero", "Carolina", "Jalapeño"], c: 2 }, { q: "Nectar of the Gods?", a: ["Milk", "Wine", "Coffee", "Tea"], c: 1 }, { q: "Most consumed beverage?", a: ["Coffee", "Water", "Tea", "Beer"], c: 1 }, { q: "French fry vegetable?", a: ["Carrot", "Potato", "Onion", "Zucchini"], c: 1 }, { q: "Bread leavening agent?", a: ["Sugar", "Salt", "Yeast", "Soda"], c: 2 }] },
-            { id: 'art', title: 'Art Gallery', icon: '🎨', description: 'Masterpieces, painters, and creative history.', questions: [{ q: "Painted Mona Lisa?", a: ["Van Gogh", "Picasso", "Da Vinci", "Michelangelo"], c: 2 }, { q: "Artist cut off his ear?", a: ["Monet", "Van Gogh", "Dali", "Rembrandt"], c: 1 }, { q: " Michelangelo's famous man?", a: ["Thinker", "David", "Pieta", "Moses"], c: 1 }, { q: "Starry Night painter?", a: ["Van Gogh", "Monet", "Picasso", "Warhol"], c: 0 }, { q: "Dali's movement?", a: ["Impression", "Cubism", "Surrealism", "Pop"], c: 2 }, { q: "Blue + Yellow = ?", a: ["Purple", "Green", "Orange", "Brown"], c: 1 }, { q: "Last Supper painter?", a: ["Da Vinci", "Raphael", "Michel", "Botti"], c: 0 }, { q: "Louvre city?", a: ["London", "Rome", "Paris", "Madrid"], c: 2 }, { q: "Soup Cans artist?", a: ["Pollock", "Warhol", "Lichten", "Haring"], c: 1 }, { q: "Wet plaster painting?", a: ["Oil", "Acrylic", "Fresco", "Tempera"], c: 2 }] },
-            { id: 'space', title: 'Space Odyssey', icon: '🚀', description: 'Stars, galaxies, and the final frontier.', questions: [{ q: "Largest planet?", a: ["Earth", "Mars", "Jupiter", "Saturn"], c: 2 }, { q: "First on moon?", a: ["Yuri", "Buzz", "Neil", "John"], c: 2 }, { q: "Our galaxy name?", a: ["Andromeda", "Milky Way", "Sombrero", "Orion"], c: 1 }, { q: "Morning Star planet?", a: ["Mars", "Venus", "Mercury", "Jupiter"], c: 1 }, { q: "Sun's primary element?", a: ["Helium", "Hydrogen", "Oxygen", "Iron"], c: 1 }, { q: "Planets in solar system?", a: ["7", "8", "9", "10"], c: 1 }, { q: "Closest to sun?", a: ["Venus", "Mars", "Mercury", "Earth"], c: 2 }, { q: "Black hole cause?", a: ["Supernova", "Collapse", "Alien", "Big Bang"], c: 1 }, { q: "Planet with rings?", a: ["Mars", "Jupiter", "Saturn", "Neptune"], c: 2 }, { q: "First satellite?", a: ["Apollo", "Voyager", "Sputnik", "Hubble"], c: 2 }] },
-            { id: 'animals', title: 'Animal Kingdom', icon: '🐘', description: 'Wildlife and nature trivia.', questions: [{ q: "Fastest land animal?", a: ["Lion", "Cheetah", "Gazelle", "Horse"], c: 1 }, { q: "Spider legs?", a: ["6", "8", "10", "12"], c: 1 }, { q: "Largest mammal?", a: ["Elephant", "Blue Whale", "Giraffe", "Shark"], c: 1 }, { q: "Bird cannot fly?", a: ["Eagle", "Parrot", "Ostrich", "Hawk"], c: 2 }, { q: "Lions group?", a: ["Pack", "Herd", "Pride", "Flock"], c: 2 }, { q: "Octopus hearts?", a: ["1", "2", "3", "4"], c: 2 }, { q: "Only flying mammal?", a: ["Bat", "Squirrel", "Eagle", "Owl"], c: 0 }, { q: "Ship of the Desert?", a: ["Horse", "Camel", "Elephant", "Donkey"], c: 1 }, { q: "Baby kangaroo name?", a: ["Joey", "Cub", "Calf", "Pup"], c: 0 }, { q: "Penguin home?", a: ["Arctic", "Antarctica", "Africa", "Australia"], c: 1 }] },
-            { id: 'mythology', title: 'Myth & Legend', icon: '🔱', description: 'Gods, monsters, and ancient stories.', questions: [{ q: "King of Greek Gods?", a: ["Hades", "Poseidon", "Zeus", "Apollo"], c: 2 }, { q: "Thor's hammer?", a: ["Excalibur", "Mjolnir", "Aegis", "Gungnir"], c: 1 }, { q: "Flew too close to sun?", a: ["Icarus", "Hercules", "Achilles", "Perseus"], c: 0 }, { q: "Brave warriors go to?", a: ["Hades", "Valhalla", "Olympus", "Atlantis"], c: 1 }, { q: "Half-man half-bull?", a: ["Centaur", "Minotaur", "Satyr", "Griffin"], c: 1 }, { q: "Snakes for hair?", a: ["Medusa", "Circe", "Athena", "Hera"], c: 0 }, { q: "Wings on sandals god?", a: ["Ares", "Hermes", "Dionysus", "Hepha"], c: 1 }, { q: "Three-headed dog?", a: ["Hydra", "Chimera", "Cerberus", "Fenrir"], c: 2 }, { q: "Goddess of love?", a: ["Artemis", "Aphrodite", "Hestia", "Demeter"], c: 1 }, { q: "Sunken city?", a: ["El Dorado", "Camelot", "Atlantis", "Pompeii"], c: 2 }] },
-            { id: 'business', title: 'Market Mogul', icon: '💼', description: 'Finance, brands, and billionaires.', questions: [{ q: "Largest retailer?", a: ["Amazon", "Walmart", "Target", "Costco"], c: 1 }, { q: "Amazon founder?", a: ["Bezos", "Gates", "Jack Ma", "Buffett"], c: 0 }, { q: "Japan currency?", a: ["Yuan", "Won", "Yen", "Baht"], c: 2 }, { q: "Swoosh logo brand?", a: ["Adidas", "Nike", "Puma", "Reebok"], c: 1 }, { q: "CEO stands for?", a: ["Exec Officer", "Energy Officer", "Engine Op", "Exec Org"], c: 0 }, { q: "Largest economy?", a: ["China", "Germany", "USA", "Japan"], c: 2 }, { q: "Oracle of Omaha?", a: ["Gates", "Buffett", "Musk", "Jobs"], c: 1 }, { q: "Model T producer?", a: ["Ford", "GM", "Toyota", "Ferrari"], c: 0 }, { q: "Apple stock ticker?", a: ["APLE", "APP", "AAPL", "APL"], c: 2 }, { q: "US Financial capital?", a: ["Chicago", "Washington", "New York", "SF"], c: 2 }] }
-        ];
+        // ==================== FIREBASE INIT ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJG1JoGs5Q37Yt0wkFb7sjnNrcz1aJ_oQ",
+            authDomain: "quizgames-17f95.firebaseapp.com",
+            projectId: "quizgames-17f95",
+            storageBucket: "quizgames-17f95.firebasestorage.app",
+            messagingSenderId: "1063425651800",
+            appId: "1:1063425651800:web:6356035da665ef41d4c62d",
+            measurementId: "G-9Q1ZEXEM8L"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-        const ITEMS_PER_PAGE = 12;
-        let currentPage = 1;
-        let totalPoints = 0;
-        let currentQuiz = null;
-        let currentQuestionIndex = 0;
-        let userAnswers = [];
+        // Global variables
+        let currentUser = null;
+        let pendingQuizId = null;
 
-        function renderLobby() {
-            const lobby = document.getElementById('lobby');
-            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-            const endIndex = startIndex + ITEMS_PER_PAGE;
-            const pageItems = quizData.slice(startIndex, endIndex);
-
-            lobby.innerHTML = pageItems.map(quiz => `
-                <div onclick="startQuiz('${quiz.id}')" class="glass-card p-6 cursor-pointer hover:border-indigo-500/50 hover:bg-white/5 transition group flex flex-col h-full">
-                    <div class="text-4xl mb-4 group-hover:scale-110 transition duration-300">${quiz.icon}</div>
-                    <h3 class="text-xl font-bold mb-2">${quiz.title}</h3>
-                    <p class="text-slate-400 text-sm mb-4 flex-grow">${quiz.description}</p>
-                    <div class="flex items-center text-indigo-400 font-semibold text-sm">
-                        Start Session 
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 group-hover:translate-x-1 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </div>
-                </div>
-            `).join('');
-
-            updatePagination();
-        }
-
-        function updatePagination() {
-            const totalPages = Math.ceil(quizData.length / ITEMS_PER_PAGE);
-            document.getElementById('page-indicator').innerText = `Page ${currentPage} of ${totalPages}`;
-            document.getElementById('page-prev').disabled = currentPage === 1;
-            document.getElementById('page-next-nav').disabled = currentPage === totalPages;
-
-            const pageNumbers = document.getElementById('page-numbers');
-            pageNumbers.innerHTML = '';
-            for (let i = 1; i <= totalPages; i++) {
-                pageNumbers.innerHTML += `
-                    <button onclick="goToPage(${i})" class="h-10 w-10 flex items-center justify-center rounded-xl glass-card transition ${currentPage === i ? 'bg-indigo-500 text-white border-indigo-500' : 'hover:bg-white/10'}">
-                        ${i}
-                    </button>
-                `;
+        // ==================== UI HELPERS ====================
+        function updateNavbar() {
+            const isLoggedIn = currentUser !== null;
+            document.getElementById('loginBtn').classList.toggle('hidden', isLoggedIn);
+            document.getElementById('profileArea').classList.toggle('hidden', !isLoggedIn);
+            document.getElementById('scoreboardBtn').classList.toggle('hidden', !isLoggedIn);
+            if (isLoggedIn) {
+                document.getElementById('usernameDisplay').textContent = currentUser.username || currentUser.email.split('@')[0];
+                document.getElementById('profileInitial').textContent = (currentUser.username?.[0] || currentUser.email[0]).toUpperCase();
+                fetchTotalScore();
             }
         }
 
-        function changePage(delta) {
-            currentPage += delta;
-            renderLobby();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        async function fetchTotalScore() {
+            if (!currentUser) return;
+            const attemptsSnap = await db.collection('attempts').where('userId', '==', currentUser.uid).get();
+            let total = 0;
+            attemptsSnap.forEach(doc => { total += doc.data().score; });
+            document.getElementById('totalScoreDisplay').textContent = total;
         }
 
-        function goToPage(page) {
-            currentPage = page;
-            renderLobby();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function showModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function showLoginModal() { showModal('loginModal'); }
+        function switchToSignup() { closeModal('loginModal'); showModal('signupModal'); }
+        function switchToLogin() { closeModal('signupModal'); showModal('loginModal'); }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            if (!email || !password) { alert('Please fill all fields'); return; }
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                closeModal('loginModal');
+            } catch (err) { alert(err.message); }
         }
 
-        function showLobby() {
-            document.getElementById('lobby-section').classList.remove('hidden');
-            document.getElementById('quiz-screen').classList.add('hidden');
-            document.getElementById('results-screen').classList.add('hidden');
-            currentQuiz = null;
+        async function signup() {
+            const username = document.getElementById('signupUsername').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            if (!username || !email || !password) { alert('Please fill all fields'); return; }
+            try {
+                const userCred = await auth.createUserWithEmailAndPassword(email, password);
+                await db.collection('users').doc(userCred.user.uid).set({ username, email });
+                closeModal('signupModal');
+            } catch (err) { alert(err.message); }
         }
 
-        function startQuiz(quizId) {
-            currentQuiz = quizData.find(q => q.id === quizId);
-            currentQuestionIndex = 0;
-            userAnswers = new Array(currentQuiz.questions.length).fill(null);
-            
-            document.getElementById('lobby-section').classList.add('hidden');
-            document.getElementById('quiz-screen').classList.remove('hidden');
-            document.getElementById('results-screen').classList.add('hidden');
-            
-            renderQuestion();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        async function logout() {
+            await auth.signOut();
+            closeModal('profileModal');
+            app.navigate('home');
         }
 
-        function renderQuestion() {
-            const question = currentQuiz.questions[currentQuestionIndex];
-            document.getElementById('question-title').innerText = question.q;
-            document.getElementById('progress-text').innerText = `Question ${currentQuestionIndex + 1} of ${currentQuiz.questions.length}`;
-            
-            const optionsGrid = document.getElementById('options-grid');
-            optionsGrid.innerHTML = question.a.map((opt, idx) => `
-                <button 
-                    onclick="selectOption(${idx})" 
-                    class="option-btn w-full text-left p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 ${userAnswers[currentQuestionIndex] === idx ? 'selected' : ''}"
-                >
-                    <span class="inline-block w-8 text-slate-500 font-bold">${String.fromCharCode(65 + idx)}</span>
-                    ${opt}
-                </button>
-            `).join('');
-
-            const nextBtn = document.getElementById('next-btn');
-            nextBtn.innerText = currentQuestionIndex === currentQuiz.questions.length - 1 ? "Submit Quiz" : "Next";
-            
-            const prevBtn = document.getElementById('prev-btn');
-            if (currentQuestionIndex > 0) prevBtn.classList.remove('hidden');
-            else prevBtn.classList.add('hidden');
-
-            const dots = document.getElementById('pagination-dots');
-            dots.innerHTML = currentQuiz.questions.map((_, i) => `
-                <div class="h-1.5 w-6 rounded-full transition-colors duration-300 ${i === currentQuestionIndex ? 'bg-indigo-500' : (userAnswers[i] !== null ? 'bg-slate-600' : 'bg-white/10')}"></div>
-            `).join('');
-        }
-
-        function selectOption(index) {
-            userAnswers[currentQuestionIndex] = index;
-            renderQuestion();
-        }
-
-        function prevQuestion() {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                renderQuestion();
-            }
-        }
-
-        function nextQuestion() {
-            if (userAnswers[currentQuestionIndex] === null) return;
-            if (currentQuestionIndex < currentQuiz.questions.length - 1) {
-                currentQuestionIndex++;
-                renderQuestion();
+        async function showScoreboard() {
+            if (!currentUser) return;
+            const attemptsSnap = await db.collection('attempts').where('userId', '==', currentUser.uid).orderBy('timestamp', 'desc').get();
+            const listDiv = document.getElementById('scoreboardList');
+            if (attemptsSnap.empty) {
+                listDiv.innerHTML = '<p class="text-gray-400 text-center">No attempts yet. Play some quizzes!</p>';
             } else {
-                finishQuiz();
-            }
-        }
-
-        function finishQuiz() {
-            let score = 0;
-            const reviewList = document.getElementById('review-list');
-            reviewList.innerHTML = '';
-
-            currentQuiz.questions.forEach((q, idx) => {
-                const isCorrect = userAnswers[idx] === q.c;
-                if (isCorrect) score++;
-                reviewList.innerHTML += `
-                    <div class="p-4 rounded-xl border ${isCorrect ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-red-500/30 bg-red-500/5'}">
-                        <p class="font-bold mb-3">${idx + 1}. ${q.q}</p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                            <div class="${isCorrect ? 'text-emerald-400' : 'text-red-400'}">
-                                <span class="text-slate-500 mr-2">Your Answer:</span> ${q.a[userAnswers[idx]]}
-                                ${isCorrect ? ' ✓' : ' ✗'}
+                let html = '';
+                attemptsSnap.forEach(doc => {
+                    const data = doc.data();
+                    html += `
+                        <div class="glass-panel rounded-xl p-4">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-bold text-white">${escapeHtml(data.quizTitle)}</h3>
+                                    <p class="text-sm text-gray-400">${escapeHtml(data.lessonTitle)}</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-indigo-400 font-bold">${data.score}/${data.totalQuestions}</span>
+                                    <p class="text-xs text-gray-500">${new Date(data.timestamp.toDate()).toLocaleString()}</p>
+                                </div>
                             </div>
-                            ${!isCorrect ? `<div class="text-emerald-400"><span class="text-slate-500 mr-2">Correct:</span> ${q.a[q.c]}</div>` : ''}
                         </div>
-                    </div>
-                `;
-            });
-
-            totalPoints += (score * 10);
-            document.getElementById('global-score-nav').innerText = `${totalPoints} pts`;
-            document.getElementById('final-score').innerText = `${score}/${currentQuiz.questions.length}`;
-            document.getElementById('percentage').innerText = `${Math.round((score / currentQuiz.questions.length) * 100)}%`;
-            document.getElementById('result-category').innerText = currentQuiz.title;
-
-            document.getElementById('quiz-screen').classList.add('hidden');
-            document.getElementById('results-screen').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+                    `;
+                });
+                listDiv.innerHTML = html;
+            }
+            showModal('scoreboardModal');
         }
 
-        window.onload = renderLobby;
+        async function showProfile() {
+            if (!currentUser) return;
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            const username = userDoc.exists ? userDoc.data().username : currentUser.email.split('@')[0];
+            const attemptsSnap = await db.collection('attempts').where('userId', '==', currentUser.uid).get();
+            let totalScore = 0;
+            attemptsSnap.forEach(doc => { totalScore += doc.data().score; });
+            const gamesPlayed = attemptsSnap.size;
+            document.getElementById('profileInfo').innerHTML = `
+                <div><span class="text-gray-400">Username:</span> <span class="text-white font-medium">${escapeHtml(username)}</span></div>
+                <div><span class="text-gray-400">Email:</span> <span class="text-white">${escapeHtml(currentUser.email)}</span></div>
+                <div><span class="text-gray-400">Total Score:</span> <span class="text-indigo-400 font-bold">${totalScore}</span></div>
+                <div><span class="text-gray-400">Games Played:</span> <span class="text-white">${gamesPlayed}</span></div>
+            `;
+            showModal('profileModal');
+        }
+
+        function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+        // ==================== ORIGINAL APP CODE (PRESERVED) ====================
+        // ----- Helper (do not modify) -----
+        function createLesson(id, title, quizzesArray) {
+            return { id, title, quizzes: quizzesArray };
+        }
+        function createQuiz(id, title, questions) {
+            return { id, title, questions };
+        }
+
+        // *******************************
+        // 1. SINHALA – 16 lessons, each with 2 quizzes (explicit)
+        // *******************************
+        // Lesson 01
+        const sinL1 = createLesson("sin_l1", "පාඩම 1: සිංහල ව්‍යාකරණ සාධක", [
+            createQuiz("sin_l1_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", [
+    // Question 1
+    {
+        question: "What is the capital of Sri Lanka?",
+        options: ["Colombo", "Kandy", "Sri Jayawardenepura Kotte", "Galle"],
+        correctAnswerIndex: 2   // 0 = Colombo, 1 = Kandy, 2 = Kotte, 3 = Galle
+    },
+    // Question 2
+    {
+        question: "Which year did Sri Lanka gain independence?",
+        options: ["1947", "1948", "1949", "1950"],
+        correctAnswerIndex: 1   // 1948 is correct
+    },
+    // Question 3
+    {
+        question: "What is the national flower of Sri Lanka?",
+        options: ["Water Lily", "Blue Water Lily", "Lotus", "Rose"],
+        correctAnswerIndex: 1   // Blue Water Lily is the correct one
+    },
+    // ... continue up to 10 questions
+    // Question 10
+    {
+        question: "Who wrote the Sri Lankan national anthem?",
+        options: ["Ananda Samarakoon", "Mahagama Sekara", "W. D. Amaradeva", "Kumaratunga Munidasa"],
+        correctAnswerIndex: 0
+    }
+]),
+            createQuiz("sin_l1_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL2 = createLesson("sin_l2", "පාඩම 2: සිංහල ව්‍යාකරණ සාධක", [
+            createQuiz("sin_l2_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l2_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL3 = createLesson("sin_l3", "පාඩම 3: සිංහල ව්‍යාකරණ සාධක", [
+            createQuiz("sin_l3_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l3_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL4 = createLesson("sin_l4", "පාඩම 4: සිංහල ව්‍යාකරණ සාධක", [
+            createQuiz("sin_l4_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l4_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL5 = createLesson("sin_l5", "පාඩම 5: සිංහල ව්‍යාකරණ සාධක", [
+            createQuiz("sin_l5_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l5_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL6 = createLesson("sin_l6", "පාඩම 6: සිංහල සාහිත්‍ය රස", [
+            createQuiz("sin_l6_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l6_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL7 = createLesson("sin_l7", "පාඩම 7: සිංහල සාහිත්‍ය රස", [
+            createQuiz("sin_l7_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l7_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL8 = createLesson("sin_l8", "පාඩම 8: සිංහල සාහිත්‍ය රස", [
+            createQuiz("sin_l8_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l8_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL9 = createLesson("sin_l9", "පාඩම 9: සිංහල සාහිත්‍ය රස", [
+            createQuiz("sin_l9_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l9_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL10 = createLesson("sin_l10", "පාඩම 10: සිංහල සාහිත්‍ය රස", [
+            createQuiz("sin_l10_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l10_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL11 = createLesson("sin_l11", "පාඩම 11: සිංහල භාෂා ප්‍රායෝගික", [
+            createQuiz("sin_l11_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l11_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL12 = createLesson("sin_l12", "පාඩම 12: සිංහල භාෂා ප්‍රායෝගික", [
+            createQuiz("sin_l12_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l12_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL13 = createLesson("sin_l13", "පාඩම 13: සිංහල භාෂා ප්‍රායෝගික", [
+            createQuiz("sin_l13_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l13_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL14 = createLesson("sin_l14", "පාඩම 14: සිංහල භාෂා ප්‍රායෝගික", [
+            createQuiz("sin_l14_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l14_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL15 = createLesson("sin_l15", "පාඩම 15: සිංහල භාෂා ප්‍රායෝගික", [
+            createQuiz("sin_l15_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l15_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+        const sinL16 = createLesson("sin_l16", "පාඩම 16: සිංහල භාෂා ප්‍රායෝගික", [
+            createQuiz("sin_l16_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
+            createQuiz("sin_l16_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+        ]);
+
+        const sinhalaLessons = [ sinL1, sinL2, sinL3, sinL4, sinL5, sinL6, sinL7, sinL8, sinL9, sinL10, sinL11, sinL12, sinL13, sinL14, sinL15, sinL16 ];
+
+        // *******************************
+        // 2. HISTORY – Grade 10 (10 lessons, each with 2 quizzes) – explicit
+        // *******************************
+        const h10L1 = createLesson("h10_l1", "10 ශ්‍රේණිය ඉතිහාසය - පාඩම 1", [
+            createQuiz("h10_l1_q1", "ඉතිහාස ප්‍රශ්න 1", []),
+            createQuiz("h10_l1_q2", "ඉතිහාස ප්‍රශ්න 2", [])
+        ]);
+        const h10L2 = createLesson("h10_l2", "10 ශ්‍රේණිය ඉතිහාසය - පාඩම 2", [
+            createQuiz("h10_l2_q1", "ඉතිහාස ප්‍රශ්න 1", []),
+            createQuiz("h10_l2_q2", "ඉතිහාස ප්‍රශ්න 2", [])
+        ]);
+        const h10L3 = createLesson("h10_l3", "10 ශ්‍රේණිය ඉතිහාසය - පාඩම 3", [
+            createQuiz("h10_l3_q1", "ඉතිහාස ප්‍රශ්න 1", []),
+            createQuiz("h10_l3_q2", "ඉතිහාස ප්‍රශ්න 2", [])
+        ]);
+        const h10L4 = createLesson("h10_l4", "10 ශ්‍රේණිය ඉතිහාසය - පාඩම 4", [
+            createQuiz("h10_l4_q1", "ඉතිහාස ප්‍රශ්න 1", []),
+            createQuiz("h10_l4_q2", "ඉතිහාස ප්‍රශ්න 2", [])
+        ]);
+        const h10L5 = createLesson("h10_l5", "10 ශ්‍රේණිය ඉතිහාසය - පාඩම 5", [
+            createQuiz("h10_l5_q1", "ඉතිහාස ප්‍රශ්න 1", []),
+            createQuiz("h10_l5_q2", "ඉතිහාස ප්‍රශ්න 2", [])
+        ]);
+        const h10L6 = createLesson("h10_l6", "10 ශ්‍රේණිය ඉතිහාසය - පාඩම 6", [
+            createQuiz("h10_l6_q1", "ඉතිහාස ප්‍රශ්න 1", []),
+            createQuiz("h10_l6_q2", "ඉතිහාස ප්‍රශ්න 2", [])
+        ]);
+        const h10L7 = createLesson("h10_l7", "10 ශ්‍රේණිය ඉතිහාසය - පාඩම 7", [
+            createQuiz("h10_l7_q1", "ඉතිහාස ප්‍රශ්න 1", []),
+            createQuiz("h10_l7_q2", "ඉතිහාස ප්‍රශ්න 2", [])
+        ]);
+        const h10L8 = createLesson("h10_l8", "10 ශ්‍රේණිය ඉතිහාසය - පාඩම 8", [
+            createQuiz("h10_l8_q1", "ඉතිහාස ප්‍රශ්න 1", []),
+            createQuiz("h10_l8_q2", "ඉතිහාස ප්‍රශ්න 2", [])
+        ]);
+        const h10L9 = createLesson("h10_l9", "10 ශ්‍රේණිය ඉතිහාසය - පාඩම 9", [
+            createQuiz("h10_l9_q1", "ඉතිහාස ප්‍රශ්න 1", []),
+            createQuiz("h10_l9_q2", "ඉතිහාස ප්‍රශ්න 2", [])
+        ]);
+        const h10L10 = createLesson("h10_l10", "10 ශ්‍රේණිය ඉතිහාසය - පාඩම 10", [
+            createQuiz("h10_l10_q1", "ඉතිහාස ප්‍රශ්න 1", []),
+            createQuiz("h10_l10_q2", "ඉතිහාස ප්‍රශ්න 2", [])
+        ]);
+        const grade10Lessons = [ h10L1, h10L2, h10L3, h10L4, h10L5, h10L6, h10L7, h10L8, h10L9, h10L10 ];
+
+        // *******************************
+        // 3. HISTORY – Grade 11 (8 lessons, each with 2 quizzes) – explicit
+        // *******************************
+        const h11L1 = createLesson("h11_l1", "11 ශ්‍රේණිය ඉතිහාසය - පාඩම 1", [
+            createQuiz("h11_l1_q1", "ඉතිහාස විමසුම 1", []),
+            createQuiz("h11_l1_q2", "ඉතිහාස විමසුම 2", [])
+        ]);
+        const h11L2 = createLesson("h11_l2", "11 ශ්‍රේණිය ඉතිහාසය - පාඩම 2", [
+            createQuiz("h11_l2_q1", "ඉතිහාස විමසුම 1", []),
+            createQuiz("h11_l2_q2", "ඉතිහාස විමසුම 2", [])
+        ]);
+        const h11L3 = createLesson("h11_l3", "11 ශ්‍රේණිය ඉතිහාසය - පාඩම 3", [
+            createQuiz("h11_l3_q1", "ඉතිහාස විමසුම 1", []),
+            createQuiz("h11_l3_q2", "ඉතිහාස විමසුම 2", [])
+        ]);
+        const h11L4 = createLesson("h11_l4", "11 ශ්‍රේණිය ඉතිහාසය - පාඩම 4", [
+            createQuiz("h11_l4_q1", "ඉතිහාස විමසුම 1", []),
+            createQuiz("h11_l4_q2", "ඉතිහාස විමසුම 2", [])
+        ]);
+        const h11L5 = createLesson("h11_l5", "11 ශ්‍රේණිය ඉතිහාසය - පාඩම 5", [
+            createQuiz("h11_l5_q1", "ඉතිහාස විමසුම 1", []),
+            createQuiz("h11_l5_q2", "ඉතිහාස විමසුම 2", [])
+        ]);
+        const h11L6 = createLesson("h11_l6", "11 ශ්‍රේණිය ඉතිහාසය - පාඩම 6", [
+            createQuiz("h11_l6_q1", "ඉතිහාස විමසුම 1", []),
+            createQuiz("h11_l6_q2", "ඉතිහාස විමසුම 2", [])
+        ]);
+        const h11L7 = createLesson("h11_l7", "11 ශ්‍රේණිය ඉතිහාසය - පාඩම 7", [
+            createQuiz("h11_l7_q1", "ඉතිහාස විමසුම 1", []),
+            createQuiz("h11_l7_q2", "ඉතිහාස විමසුම 2", [])
+        ]);
+        const h11L8 = createLesson("h11_l8", "11 ශ්‍රේණිය ඉතිහාසය - පාඩම 8", [
+            createQuiz("h11_l8_q1", "ඉතිහාස විමසුම 1", []),
+            createQuiz("h11_l8_q2", "ඉතිහාස විමසුම 2", [])
+        ]);
+        const grade11Lessons = [ h11L1, h11L2, h11L3, h11L4, h11L5, h11L6, h11L7, h11L8 ];
+
+        // *******************************
+        // 4. GENERAL KNOWLEDGE – 6 lessons, each with 2 quizzes – explicit
+        // *******************************
+        const gkL1 = createLesson("gk_l1", "General Knowledge Module 1", [
+            createQuiz("gk_l1_q1", "Quiz A: Essentials", []),
+            createQuiz("gk_l1_q2", "Quiz B: Advanced", [])
+        ]);
+        const gkL2 = createLesson("gk_l2", "General Knowledge Module 2", [
+            createQuiz("gk_l2_q1", "Quiz A: Essentials", []),
+            createQuiz("gk_l2_q2", "Quiz B: Advanced", [])
+        ]);
+        const gkL3 = createLesson("gk_l3", "General Knowledge Module 3", [
+            createQuiz("gk_l3_q1", "Quiz A: Essentials", []),
+            createQuiz("gk_l3_q2", "Quiz B: Advanced", [])
+        ]);
+        const gkL4 = createLesson("gk_l4", "General Knowledge Module 4", [
+            createQuiz("gk_l4_q1", "Quiz A: Essentials", []),
+            createQuiz("gk_l4_q2", "Quiz B: Advanced", [])
+        ]);
+        const gkL5 = createLesson("gk_l5", "General Knowledge Module 5", [
+            createQuiz("gk_l5_q1", "Quiz A: Essentials", []),
+            createQuiz("gk_l5_q2", "Quiz B: Advanced", [])
+        ]);
+        const gkL6 = createLesson("gk_l6", "General Knowledge Module 6", [
+            createQuiz("gk_l6_q1", "Quiz A: Essentials", []),
+            createQuiz("gk_l6_q2", "Quiz B: Advanced", [])
+        ]);
+        const gkLessons = [ gkL1, gkL2, gkL3, gkL4, gkL5, gkL6 ];
+
+        // ========= FINAL DATABASE ==========
+        const DB = {
+            sinhala: {
+                id: "sinhala",
+                title: "Sinhala Language",
+                description: "සම්පූර්ණ ව්‍යාකරණ, සාහිත්‍ය හා භාෂා අභ්‍යාස. පාඩම් 16 කින් සමන්විතයි.",
+                icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
+                lessons: sinhalaLessons
+            },
+            history: {
+                id: "history",
+                title: "History",
+                description: "ඓතිහාසික ගමන් මග. ශ්‍රේණි අනුව ඉගෙන ගන්න.",
+                icon: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+                subcategories: [
+                    { id: "history_10", title: "Grade 10 History", description: "පුරාතන ශ්‍රී ලංකා ඉතිහාසය හා මුල් යුග (පාඩම් 10)", lessons: grade10Lessons },
+                    { id: "history_11", title: "Grade 11 History", description: "මධ්‍යතන හා නූතන ඉතිහාසය (පාඩම් 8)", lessons: grade11Lessons }
+                ]
+            },
+            gk: {
+                id: "gk",
+                title: "General Knowledge",
+                description: "Test your intellect across science, geography, literature & more (English).",
+                icon: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
+                lessons: gkLessons
+            }
+        };
+
+        // ========= APPLICATION LOGIC (MODIFIED FOR AUTH) ==========
+        const app = {
+            container: document.getElementById('app-container'),
+            state: {
+                view: 'home',
+                categoryId: null,
+                subcategoryId: null,
+                lessonId: null,
+                quizId: null,
+                userAnswers: {},
+                score: 0,
+                path: []
+            },
+            init() { this.navigate('home'); init3DBackground(); },
+            navigate(view, params = {}) {
+                // Protect quiz start
+                if (view === 'active_quiz' && !currentUser) {
+                    pendingQuizId = params.quizId;
+                    showLoginModal();
+                    return;
+                }
+                pendingQuizId = null;
+                window.scrollTo(0, 0);
+                this.state.view = view;
+                if (view === 'home') {
+                    this.state = { view: 'home', categoryId: null, subcategoryId: null, lessonId: null, quizId: null, userAnswers: {}, score: 0, path: [{label: 'Home', view: 'home'}] };
+                    this.renderHome();
+                } else if (view === 'subcategories') {
+                    this.state.categoryId = params.categoryId;
+                    this.state.path = [{label: 'Home', view: 'home'}, {label: DB[params.categoryId].title, view: 'subcategories', params}];
+                    this.renderSubcategories();
+                } else if (view === 'lessons') {
+                    if(params.categoryId) this.state.categoryId = params.categoryId;
+                    if(params.subcategoryId) this.state.subcategoryId = params.subcategoryId;
+                    let catTitle = DB[this.state.categoryId].title;
+                    let title = this.state.subcategoryId ? DB[this.state.categoryId].subcategories.find(s=>s.id===this.state.subcategoryId).title : catTitle;
+                    this.state.path = [{label: 'Home', view: 'home'}];
+                    if(this.state.subcategoryId) this.state.path.push({label: catTitle, view: 'subcategories', params: {categoryId: this.state.categoryId}});
+                    this.state.path.push({label: title, view: 'lessons', params});
+                    this.renderLessons();
+                } else if (view === 'quizzes') {
+                    this.state.lessonId = params.lessonId;
+                    let lesson = this.getLessonData();
+                    this.state.path.push({label: lesson.title, view: 'quizzes', params});
+                    this.renderQuizzes();
+                } else if (view === 'active_quiz') {
+                    this.state.quizId = params.quizId;
+                    this.state.userAnswers = {};
+                    let quiz = this.getQuizData();
+                    this.state.path.push({label: quiz.title, view: 'active_quiz', params});
+                    this.renderActiveQuiz();
+                } else if (view === 'results') { this.renderResults(); }
+                this.renderBreadcrumbs();
+                setTimeout(attachTiltEffect, 50);
+            },
+            getLessonData() {
+                let cat = DB[this.state.categoryId];
+                let source = this.state.subcategoryId ? cat.subcategories.find(s=>s.id===this.state.subcategoryId).lessons : cat.lessons;
+                return source.find(l => l.id === this.state.lessonId);
+            },
+            getQuizData() { return this.getLessonData().quizzes.find(q => q.id === this.state.quizId); },
+            renderBreadcrumbs() {
+                const bc = document.getElementById('breadcrumbs');
+                bc.innerHTML = this.state.path.map((step, idx) => {
+                    let isLast = idx === this.state.path.length - 1;
+                    return `<span class="flex items-center gap-2"><span class="${isLast ? 'text-white font-bold' : 'cursor-pointer hover:text-indigo-400 transition-colors'}" onclick="${isLast ? '' : `app.navigate('${step.view}', ${JSON.stringify(step.params || {})})`}">${step.label}</span>${!isLast ? '<svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>' : ''}</span>`;
+                }).join('');
+            },
+            renderHome() {
+                let html = `<div class="text-center mb-16 fade-in"><h1 class="text-5xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-gray-400 drop-shadow-lg">Select Module</h1><p class="text-xl text-gray-400 max-w-2xl mx-auto">Enter the simulation. Choose a knowledge domain to begin your training sequence.</p></div><div class="grid grid-cols-1 md:grid-cols-3 gap-8">`;
+                Object.values(DB).forEach((cat, index) => {
+                    let isHistory = cat.id === 'history';
+                    let action = isHistory ? `app.navigate('subcategories', {categoryId: '${cat.id}'})` : `app.navigate('lessons', {categoryId: '${cat.id}'})`;
+                    html += `<div class="tilt-wrapper slide-up" style="animation-delay: ${index * 0.1}s"><div class="tilt-card glass-panel rounded-3xl p-8 h-full cursor-pointer flex flex-col items-center text-center group" onclick="${action}"><div class="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mb-6 float-element border border-white/10 group-hover:bg-indigo-500/20 transition-colors"><svg class="w-10 h-10 text-indigo-400 group-hover:text-pink-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="${cat.icon}"></path></svg></div><h2 class="text-3xl font-bold mb-4 float-element brand-font">${cat.title}</h2><p class="text-gray-400 float-element">${cat.description}</p><div class="mt-8 float-element text-indigo-400 font-semibold group-hover:text-pink-400 transition-colors flex items-center gap-2">Initialize <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg></div></div></div>`;
+                });
+                html += `</div>`;
+                this.container.innerHTML = html;
+            },
+            renderSubcategories() {
+                const cat = DB[this.state.categoryId];
+                let html = `<div class="mb-12 fade-in"><button onclick="app.navigate('home')" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-white transition-colors bg-white/5 px-4 py-2 rounded-lg border border-white/10 hover:bg-white/10 w-max"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button><h1 class="text-4xl md:text-5xl font-bold brand-font text-white mb-4">${cat.title} Divisions</h1><p class="text-gray-400 text-lg">Select a specific grade to access lessons.</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">`;
+                cat.subcategories.forEach((sub, index) => { html += `<div class="tilt-wrapper slide-up" style="animation-delay: ${index * 0.1}s"><div class="tilt-card glass-panel rounded-3xl p-8 cursor-pointer group" onclick="app.navigate('lessons', {categoryId: '${cat.id}', subcategoryId: '${sub.id}'})"><div class="flex justify-between items-start mb-6 float-element"><h2 class="text-3xl font-bold brand-font">${sub.title}</h2><div class="bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full text-sm font-bold border border-indigo-500/30">${sub.lessons.length} Lessons</div></div><p class="text-gray-400 float-element">${sub.description}</p></div></div>`; });
+                html += `</div>`; this.container.innerHTML = html;
+            },
+            renderLessons() {
+                let source, title, backTarget, backParams;
+                if (this.state.subcategoryId) { let cat = DB[this.state.categoryId], sub = cat.subcategories.find(s => s.id === this.state.subcategoryId); source = sub.lessons; title = sub.title; backTarget = 'subcategories'; backParams = `{categoryId: '${this.state.categoryId}'}`; }
+                else { let cat = DB[this.state.categoryId]; source = cat.lessons; title = cat.title; backTarget = 'home'; backParams = `{}`; }
+                let html = `<div class="mb-12 fade-in"><button onclick="app.navigate('${backTarget}', ${backParams})" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-white transition-colors bg-white/5 px-4 py-2 rounded-lg border border-white/10 hover:bg-white/10 w-max"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button><h1 class="text-4xl md:text-5xl font-bold brand-font text-white mb-2">${title}</h1><p class="text-gray-400 text-lg">Total Lessons: <span class="text-indigo-400 font-bold">${source.length}</span></p></div><div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">`;
+                source.forEach((lesson, idx) => { html += `<div class="tilt-wrapper slide-up" style="animation-delay: ${(idx % 10) * 0.05}s"><div class="tilt-card glass-panel rounded-2xl p-6 cursor-pointer group h-full flex flex-col" onclick="app.navigate('quizzes', {lessonId: '${lesson.id}'})"><div class="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 float-element text-xl font-bold text-gray-400 group-hover:text-white group-hover:bg-indigo-500/50 transition-all">${idx + 1}</div><h3 class="text-xl font-bold mb-2 float-element text-white">${lesson.title}</h3><div class="mt-auto pt-4 float-element text-sm text-gray-400 font-medium">${lesson.quizzes.length} Quizzes Available</div></div></div>`; });
+                html += `</div>`; this.container.innerHTML = html;
+            },
+            renderQuizzes() {
+                let lesson = this.getLessonData();
+                let backParams = this.state.subcategoryId ? `{categoryId: '${this.state.categoryId}', subcategoryId: '${this.state.subcategoryId}'}` : `{categoryId: '${this.state.categoryId}'}`;
+                let html = `<div class="mb-12 fade-in max-w-4xl mx-auto"><button onclick="app.navigate('lessons', ${backParams})" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-white transition-colors bg-white/5 px-4 py-2 rounded-lg border border-white/10 hover:bg-white/10 w-max"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back to Lessons</button><h1 class="text-4xl md:text-5xl font-bold brand-font text-white mb-4">${lesson.title}</h1><p class="text-gray-400 text-lg">Select a quiz to begin the simulation.</p></div><div class="flex flex-col gap-6 max-w-4xl mx-auto">`;
+                lesson.quizzes.forEach((quiz, idx) => { html += `<div class="tilt-wrapper slide-up" style="animation-delay: ${idx * 0.1}s"><div class="tilt-card glass-panel rounded-2xl p-6 md:p-8 cursor-pointer group flex flex-col md:flex-row items-start md:items-center justify-between gap-6" onclick="app.navigate('active_quiz', {quizId: '${quiz.id}'})"><div class="float-element"><h3 class="text-2xl font-bold mb-2 text-white group-hover:text-indigo-300 transition-colors">${quiz.title}</h3><p class="text-gray-400 flex items-center gap-2"><svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>${quiz.questions.length} Questions</p></div><button class="float-element btn-premium px-8 py-3 rounded-xl font-bold text-white shadow-lg whitespace-nowrap">Start Quiz</button></div></div>`; });
+                html += `</div>`; this.container.innerHTML = html;
+            },
+            renderActiveQuiz() {
+                let quiz = this.getQuizData();
+                let html = `<div class="mb-10 fade-in flex flex-col md:flex-row justify-between items-start md:items-end gap-6 max-w-3xl mx-auto border-b border-white/10 pb-6"><div><button onclick="if(confirm('Quit current quiz? Progress will be lost.')) app.navigate('quizzes', {lessonId: '${this.state.lessonId}'})" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors bg-white/5 px-4 py-2 rounded-lg border border-white/10 hover:bg-white/10 w-max"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> Abandon Quiz</button><h1 class="text-3xl md:text-4xl font-bold brand-font text-white">${quiz.title}</h1></div><div class="glass-panel px-6 py-3 rounded-2xl flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-pink-500 animate-pulse"></div><span class="font-bold text-lg text-indigo-200">Simulation Active</span></div></div><div class="max-w-3xl mx-auto flex flex-col gap-10">`;
+                quiz.questions.forEach((q, qIndex) => { html += `<div class="tilt-wrapper slide-up" style="animation-delay: ${(qIndex%5) * 0.1}s"><div class="tilt-card glass-panel rounded-3xl p-8 shadow-2xl relative overflow-hidden"><div class="absolute top-0 right-0 bg-indigo-500/20 px-4 py-2 rounded-bl-2xl border-b border-l border-indigo-500/30 text-indigo-300 font-bold">Q ${qIndex + 1} / 10</div><h3 class="text-2xl font-medium mb-8 mt-4 float-element leading-relaxed">${q.question}</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4 float-element">`;
+                    q.options.forEach((opt, oIndex) => { let isChecked = this.state.userAnswers[qIndex] === oIndex; html += `<label class="quiz-option cursor-pointer group relative"><input type="radio" name="q_${qIndex}" value="${oIndex}" class="hidden" onchange="app.selectAnswer(${qIndex}, ${oIndex})" ${isChecked ? 'checked' : ''}><div class="p-5 rounded-xl border border-white/10 bg-white/5 text-gray-300 transition-all duration-300 group-hover:bg-white/10 group-hover:border-white/30 group-hover:text-white min-h-[80px] flex items-center"><div class="w-8 h-8 rounded-full border-2 border-gray-500 mr-4 flex-shrink-0 flex items-center justify-center transition-colors"><div class="w-3 h-3 rounded-full bg-white opacity-0 transition-opacity marker"></div></div><span class="text-lg leading-snug">${opt}</span></div><style>input:checked + div .marker { opacity: 1; } input:checked + div .w-8 { border-color: #fff; }</style></label>`; });
+                html += `</div></div></div>`; });
+                html += `<div class="mt-8 text-center pb-10 slide-up" style="animation-delay: 1s"><button onclick="app.submitQuiz()" class="btn-premium px-12 py-5 rounded-2xl text-xl font-bold shadow-[0_0_40px_rgba(79,70,229,0.4)] w-full md:w-auto">SUBMIT AND EVALUATE</button><p id="submit-error" class="text-red-400 mt-4 hidden font-medium">Please answer all 10 questions before submitting.</p></div></div>`;
+                this.container.innerHTML = html;
+            },
+            selectAnswer(qIndex, oIndex) { this.state.userAnswers[qIndex] = oIndex; if(document.getElementById('submit-error')) document.getElementById('submit-error').classList.add('hidden'); },
+            submitQuiz() {
+                let quiz = this.getQuizData();
+                if (Object.keys(this.state.userAnswers).length < quiz.questions.length) {
+                    document.getElementById('submit-error').classList.remove('hidden');
+                    return;
+                }
+                let score = 0;
+                quiz.questions.forEach((q, idx) => { if (this.state.userAnswers[idx] === q.correctAnswerIndex) score++; });
+                this.state.score = score;
+                // Save to Firestore if logged in
+                if (currentUser) {
+                    const lesson = this.getLessonData();
+                    db.collection('attempts').add({
+                        userId: currentUser.uid,
+                        quizId: quiz.id,
+                        quizTitle: quiz.title,
+                        lessonTitle: lesson.title,
+                        score: score,
+                        totalQuestions: quiz.questions.length,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => {
+                        fetchTotalScore();
+                    }).catch(console.error);
+                }
+                this.navigate('results');
+            },
+            renderResults() {
+                let quiz = this.getQuizData();
+                let score = this.state.score;
+                let total = quiz.questions.length;
+                let percentage = (score / total) * 100;
+                let colorClass = percentage >= 80 ? 'text-green-400' : (percentage >= 50 ? 'text-yellow-400' : 'text-red-400');
+                let ringColor = percentage >= 80 ? '#22c55e' : (percentage >= 50 ? '#eab308' : '#ef4444');
+                let html = `<div class="max-w-4xl mx-auto fade-in"><div class="glass-panel rounded-3xl p-10 mb-12 text-center relative overflow-hidden shadow-2xl border-t border-white/20"><div class="absolute inset-0 opacity-20" style="background: radial-gradient(circle at 50% -20%, ${ringColor}, transparent 70%);"></div><h2 class="text-3xl font-bold brand-font text-white mb-8 relative z-10">Simulation Complete</h2><div class="relative w-48 h-48 mx-auto mb-8 z-10"><svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"></circle><circle cx="50" cy="50" r="45" fill="none" stroke="${ringColor}" stroke-width="8" stroke-dasharray="283" stroke-dashoffset="${283 - (283 * percentage / 100)}" class="transition-all duration-1000 ease-out"></circle></svg><div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-5xl font-bold brand-font ${colorClass}">${score}</span><span class="text-gray-400 font-medium text-lg border-t border-white/20 pt-1 mt-1 w-1/2">out of ${total}</span></div></div><button onclick="app.navigate('quizzes', {lessonId: '${this.state.lessonId}'})" class="relative z-10 bg-white/10 hover:bg-white/20 border border-white/20 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg backdrop-blur-md">Return to Quizzes</button></div><h3 class="text-3xl font-bold brand-font mb-8 text-center text-white">Performance Review</h3><div class="flex flex-col gap-8">`;
+                quiz.questions.forEach((q, qIndex) => { let userAns = this.state.userAnswers[qIndex]; let isCorrect = userAns === q.correctAnswerIndex; html += `<div class="glass-panel rounded-2xl p-8 border-l-4 ${isCorrect ? 'border-l-green-500' : 'border-l-red-500'} relative slide-up" style="animation-delay: ${qIndex * 0.1}s"><div class="absolute -left-3 top-8 w-6 h-6 rounded-full flex items-center justify-center shadow-lg ${isCorrect ? 'bg-green-500' : 'bg-red-500'} text-white">${isCorrect ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>'}</div><h4 class="text-xl font-medium mb-6 text-gray-100 pl-4">${qIndex + 1}. ${q.question}</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-3 pl-4">`;
+                    q.options.forEach((opt, oIndex) => { let isUsersChoice = userAns === oIndex; let isActualCorrect = q.correctAnswerIndex === oIndex; let baseStyle = "p-4 rounded-xl border border-white/10 bg-white/5 text-gray-400 flex items-center gap-3"; let icon = `<div class="w-6 h-6 rounded-full border border-gray-600 flex-shrink-0"></div>`; if (isActualCorrect) { baseStyle = "p-4 rounded-xl border-2 border-green-500 bg-green-500/20 text-green-100 flex items-center gap-3 font-bold shadow-[0_0_15px_rgba(34,197,94,0.2)]"; icon = `<div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>`; } else if (isUsersChoice && !isActualCorrect) { baseStyle = "p-4 rounded-xl border-2 border-red-500 bg-red-500/20 text-red-100 flex items-center gap-3 shadow-[0_0_15px_rgba(239,68,68,0.2)]"; icon = `<div class="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg></div>`; } html += `<div class="${baseStyle}">${icon}<span>${opt} ${isUsersChoice ? '<span class="ml-2 text-xs uppercase tracking-wider opacity-70 border px-2 py-0.5 rounded-full">(Your Answer)</span>' : ''}</span></div>`; });
+                html += `</div></div>`; });
+                html += `</div><div class="mt-12 text-center pb-20"><button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="text-gray-400 hover:text-white flex items-center justify-center gap-2 mx-auto transition-colors">Back to top <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg></button></div></div>`;
+                this.container.innerHTML = html;
+            }
+        };
+        
+        function attachTiltEffect() { const cards = document.querySelectorAll('.tilt-card'); cards.forEach(card => { if(card.dataset.tiltInit === 'true') return; card.dataset.tiltInit = 'true'; card.addEventListener('mousemove', (e) => { const rect = card.getBoundingClientRect(); const x = e.clientX - rect.left; const y = e.clientY - rect.top; const centerX = rect.width / 2; const centerY = rect.height / 2; const rotateX = ((y - centerY) / centerY) * -8; const rotateY = ((x - centerX) / centerX) * 8; card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`; }); card.addEventListener('mouseleave', () => { card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`; }); }); }
+        
+        function init3DBackground() { const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let width, height, particles = []; function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; } window.addEventListener('resize', resize); resize(); class Particle { constructor() { this.x = Math.random() * width; this.y = Math.random() * height; this.z = Math.random() * 2 + 0.1; this.vx = (Math.random() - 0.5) * 0.5; this.vy = (Math.random() - 0.5) * 0.5; this.radius = Math.random() * 1.5 + 0.5; } update(mouseX, mouseY) { this.x += this.vx; this.y += this.vy; let dx = (mouseX - width/2) * (this.z * 0.005); let dy = (mouseY - height/2) * (this.z * 0.005); if (this.x > width) this.x = 0; if (this.x < 0) this.x = width; if (this.y > height) this.y = 0; if (this.y < 0) this.y = height; this.draw(dx, dy); } draw(dx, dy) { ctx.beginPath(); ctx.arc(this.x + dx, this.y + dy, this.radius, 0, Math.PI * 2); ctx.fillStyle = `rgba(255, 255, 255, ${0.3 * this.z})`; ctx.fill(); } } for(let i=0; i<100; i++) particles.push(new Particle()); let mouseX = width/2, mouseY = height/2; window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; }); function animate() { ctx.clearRect(0, 0, width, height); particles.forEach(p => p.update(mouseX, mouseY)); for(let i=0; i<particles.length; i++) { for(let j=i+1; j<particles.length; j++) { let dx = particles[i].x - particles[j].x; let dy = particles[i].y - particles[j].y; let dist = Math.sqrt(dx*dx + dy*dy); if(dist < 100) { ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = `rgba(79, 70, 229, ${0.15 * (1 - dist/100)})`; ctx.stroke(); } } } requestAnimationFrame(animate); } animate(); }
+        
+        // ==================== AUTH STATE LISTENER ====================
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                currentUser = { uid: user.uid, email: user.email, username: userDoc.exists ? userDoc.data().username : user.email.split('@')[0] };
+                updateNavbar();
+                if (pendingQuizId) {
+                    app.navigate('active_quiz', { quizId: pendingQuizId });
+                    pendingQuizId = null;
+                }
+            } else {
+                currentUser = null;
+                updateNavbar();
+                if (app.state.view === 'active_quiz') {
+                    app.navigate('home');
+                }
+            }
+        });
+        
+        window.onload = () => { app.init(); };
     </script>
 </body>
 </html>
