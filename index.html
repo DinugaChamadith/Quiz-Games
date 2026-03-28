@@ -6,6 +6,11 @@
     <title>Nexus | Premium 3D Quiz Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Premium Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234f46e5'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='48' fill='url(%23grad)' stroke='white' stroke-width='2'/%3E%3Cpath fill='white' d='M44 28 L66 48 L52 52 L56 72 L34 52 L48 48 Z'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234f46e5'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='90' cy='90' r='86' fill='url(%23grad)' stroke='white' stroke-width='4'/%3E%3Cpath fill='white' d='M80 50 L118 86 L94 92 L100 128 L62 92 L86 86 Z' transform='scale(1.2) translate(-10,-10)'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#4f46e5">
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -180,6 +185,12 @@
             max-width: 400px;
             width: 90%;
         }
+        .admin-modal-content {
+            max-width: 90%;
+            width: 1200px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -200,6 +211,12 @@
             </div>
             
             <div class="flex items-center gap-4">
+                <!-- Admin Button – initially hidden, shown only for admin via JavaScript -->
+                <button id="adminBtn" style="display: none;" class="md:flex items-center gap-2 bg-red-500/20 hover:bg-red-500/30 px-4 py-2 rounded-xl transition-all text-sm font-semibold border border-red-500/30" onclick="showAdminPanel()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
+                    Admin Panel
+                </button>
+
                 <!-- Scoreboard Button -->
                 <button id="scoreboardBtn" class="hidden md:flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-all text-sm font-semibold" onclick="showScoreboard()">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
@@ -281,6 +298,19 @@
         </div>
     </div>
 
+    <!-- Admin Panel Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content glass-panel rounded-2xl p-8 admin-modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Admin Dashboard</h2>
+                <button onclick="closeModal('adminModal')" class="text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <div id="adminContent" class="space-y-6">
+                <p class="text-gray-400 text-center">Loading user data...</p>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ==================== FIREBASE INIT ====================
         const firebaseConfig = {
@@ -306,6 +336,14 @@
             document.getElementById('loginBtn').classList.toggle('hidden', isLoggedIn);
             document.getElementById('profileArea').classList.toggle('hidden', !isLoggedIn);
             document.getElementById('scoreboardBtn').classList.toggle('hidden', !isLoggedIn);
+            
+            // Admin button visibility: only when logged in with the admin email
+            const isAdmin = currentUser && currentUser.email === "dinugachamadith2009@gmail.com";
+            const adminBtn = document.getElementById('adminBtn');
+            if (adminBtn) {
+                adminBtn.style.display = isAdmin ? 'flex' : 'none';
+            }
+            
             if (isLoggedIn) {
                 document.getElementById('usernameDisplay').textContent = currentUser.username || currentUser.email.split('@')[0];
                 document.getElementById('profileInitial').textContent = (currentUser.username?.[0] || currentUser.email[0]).toUpperCase();
@@ -313,12 +351,17 @@
             }
         }
 
+        // Fetch total score from user's attempts subcollection
         async function fetchTotalScore() {
             if (!currentUser) return;
-            const attemptsSnap = await db.collection('attempts').where('userId', '==', currentUser.uid).get();
-            let total = 0;
-            attemptsSnap.forEach(doc => { total += doc.data().score; });
-            document.getElementById('totalScoreDisplay').textContent = total;
+            try {
+                const attemptsSnap = await db.collection('users').doc(currentUser.uid).collection('attempts').get();
+                let total = 0;
+                attemptsSnap.forEach(doc => { total += doc.data().score; });
+                document.getElementById('totalScoreDisplay').textContent = total;
+            } catch (e) {
+                console.error("Error fetching total score:", e);
+            }
         }
 
         function showModal(id) { document.getElementById(id).classList.add('active'); }
@@ -355,54 +398,177 @@
             app.navigate('home');
         }
 
+        // Show scoreboard using attempts subcollection
         async function showScoreboard() {
             if (!currentUser) return;
-            const attemptsSnap = await db.collection('attempts').where('userId', '==', currentUser.uid).orderBy('timestamp', 'desc').get();
-            const listDiv = document.getElementById('scoreboardList');
-            if (attemptsSnap.empty) {
-                listDiv.innerHTML = '<p class="text-gray-400 text-center">No attempts yet. Play some quizzes!</p>';
-            } else {
-                let html = '';
-                attemptsSnap.forEach(doc => {
-                    const data = doc.data();
-                    html += `
-                        <div class="glass-panel rounded-xl p-4">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <h3 class="font-bold text-white">${escapeHtml(data.quizTitle)}</h3>
-                                    <p class="text-sm text-gray-400">${escapeHtml(data.lessonTitle)}</p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-indigo-400 font-bold">${data.score}/${data.totalQuestions}</span>
-                                    <p class="text-xs text-gray-500">${new Date(data.timestamp.toDate()).toLocaleString()}</p>
+            try {
+                const attemptsSnap = await db.collection('users').doc(currentUser.uid).collection('attempts').orderBy('timestamp', 'desc').get();
+                const listDiv = document.getElementById('scoreboardList');
+                if (attemptsSnap.empty) {
+                    listDiv.innerHTML = '<p class="text-gray-400 text-center">No attempts yet. Play some quizzes!</p>';
+                } else {
+                    let html = '';
+                    attemptsSnap.forEach(doc => {
+                        const data = doc.data();
+                        const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'Just now';
+                        html += `
+                            <div class="glass-panel rounded-xl p-4">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h3 class="font-bold text-white">${escapeHtml(data.quizTitle)}</h3>
+                                        <p class="text-sm text-gray-400">${escapeHtml(data.lessonTitle)}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-indigo-400 font-bold">${data.score}/${data.totalQuestions}</span>
+                                        <p class="text-xs text-gray-500">${date}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
-                });
-                listDiv.innerHTML = html;
+                        `;
+                    });
+                    listDiv.innerHTML = html;
+                }
+                showModal('scoreboardModal');
+            } catch (e) {
+                console.error("Error loading scoreboard:", e);
+                document.getElementById('scoreboardList').innerHTML = '<p class="text-red-400 text-center">Error loading data. Please try again.</p>';
+                showModal('scoreboardModal');
             }
-            showModal('scoreboardModal');
         }
 
         async function showProfile() {
             if (!currentUser) return;
-            const userDoc = await db.collection('users').doc(currentUser.uid).get();
-            const username = userDoc.exists ? userDoc.data().username : currentUser.email.split('@')[0];
-            const attemptsSnap = await db.collection('attempts').where('userId', '==', currentUser.uid).get();
-            let totalScore = 0;
-            attemptsSnap.forEach(doc => { totalScore += doc.data().score; });
-            const gamesPlayed = attemptsSnap.size;
-            document.getElementById('profileInfo').innerHTML = `
-                <div><span class="text-gray-400">Username:</span> <span class="text-white font-medium">${escapeHtml(username)}</span></div>
-                <div><span class="text-gray-400">Email:</span> <span class="text-white">${escapeHtml(currentUser.email)}</span></div>
-                <div><span class="text-gray-400">Total Score:</span> <span class="text-indigo-400 font-bold">${totalScore}</span></div>
-                <div><span class="text-gray-400">Games Played:</span> <span class="text-white">${gamesPlayed}</span></div>
-            `;
-            showModal('profileModal');
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                const username = userDoc.exists ? userDoc.data().username : currentUser.email.split('@')[0];
+                const attemptsSnap = await db.collection('users').doc(currentUser.uid).collection('attempts').get();
+                let totalScore = 0;
+                attemptsSnap.forEach(doc => { totalScore += doc.data().score; });
+                const gamesPlayed = attemptsSnap.size;
+                document.getElementById('profileInfo').innerHTML = `
+                    <div><span class="text-gray-400">Username:</span> <span class="text-white font-medium">${escapeHtml(username)}</span></div>
+                    <div><span class="text-gray-400">Email:</span> <span class="text-white">${escapeHtml(currentUser.email)}</span></div>
+                    <div><span class="text-gray-400">Total Score:</span> <span class="text-indigo-400 font-bold">${totalScore}</span></div>
+                    <div><span class="text-gray-400">Games Played:</span> <span class="text-white">${gamesPlayed}</span></div>
+                `;
+                showModal('profileModal');
+            } catch (e) {
+                console.error("Error loading profile:", e);
+                document.getElementById('profileInfo').innerHTML = '<p class="text-red-400">Error loading profile data.</p>';
+                showModal('profileModal');
+            }
         }
 
-        function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+        // ==================== ADMIN PANEL ====================
+        async function showAdminPanel() {
+            if (!currentUser || currentUser.email !== "dinugachamadith2009@gmail.com") return;
+            showModal('adminModal');
+            document.getElementById('adminContent').innerHTML = '<p class="text-gray-400 text-center">Loading user data...</p>';
+            
+            try {
+                // Fetch all users
+                const usersSnap = await db.collection('users').get();
+                let html = '';
+                
+                for (const userDoc of usersSnap.docs) {
+                    const userData = userDoc.data();
+                    const userId = userDoc.id;
+                    const email = userData.email;
+                    const username = userData.username || email.split('@')[0];
+                    
+                    // Get all attempts for this user
+                    const attemptsSnap = await db.collection('users').doc(userId).collection('attempts').orderBy('timestamp', 'desc').get();
+                    const attempts = [];
+                    attemptsSnap.forEach(attemptDoc => {
+                        const a = attemptDoc.data();
+                        attempts.push({
+                            quizTitle: a.quizTitle,
+                            lessonTitle: a.lessonTitle,
+                            score: a.score,
+                            total: a.totalQuestions,
+                            timestamp: a.timestamp?.toDate() || new Date(),
+                            quizId: a.quizId
+                        });
+                    });
+                    
+                    // Calculate stats per game
+                    const gameStats = {};
+                    attempts.forEach(attempt => {
+                        const key = attempt.quizId;
+                        if (!gameStats[key]) {
+                            gameStats[key] = {
+                                title: attempt.quizTitle,
+                                lesson: attempt.lessonTitle,
+                                count: 0,
+                                totalScore: 0,
+                                attempts: []
+                            };
+                        }
+                        gameStats[key].count++;
+                        gameStats[key].totalScore += attempt.score;
+                        gameStats[key].attempts.push({ score: attempt.score, total: attempt.total, timestamp: attempt.timestamp });
+                    });
+                    
+                    html += `
+                        <div class="glass-panel rounded-xl p-5 mb-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">${escapeHtml(username)}</h3>
+                                    <p class="text-sm text-gray-400">${escapeHtml(email)}</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-indigo-400 font-bold">Total Games: ${attempts.length}</span><br>
+                                    <span class="text-indigo-400 font-bold">Total Score: ${attempts.reduce((sum, a) => sum + a.score, 0)}</span>
+                                </div>
+                            </div>
+                            <div class="mt-3 space-y-2">
+                                ${Object.values(gameStats).map(stat => `
+                                    <div class="bg-white/5 rounded-lg p-3">
+                                        <div class="flex justify-between items-center">
+                                            <div>
+                                                <p class="font-semibold text-white">${escapeHtml(stat.title)}</p>
+                                                <p class="text-xs text-gray-400">${escapeHtml(stat.lesson)}</p>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-sm">Played: <span class="text-indigo-300">${stat.count}</span> times</p>
+                                                <p class="text-sm">Total Score: <span class="text-green-400">${stat.totalScore}</span></p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 space-y-1">
+                                            ${stat.attempts.map(att => `
+                                                <div class="flex justify-between text-xs text-gray-400">
+                                                    <span>${att.timestamp.toLocaleString()}</span>
+                                                    <span>Score: ${att.score}/${att.total}</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (usersSnap.empty) {
+                    html = '<p class="text-gray-400 text-center">No users found.</p>';
+                }
+                
+                document.getElementById('adminContent').innerHTML = html;
+            } catch (error) {
+                console.error("Admin panel error:", error);
+                document.getElementById('adminContent').innerHTML = '<p class="text-red-400 text-center">Error loading data. Check console.</p>';
+            }
+        }
+
+        function escapeHtml(str) { 
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m){
+                if(m==='&') return '&amp;';
+                if(m==='<') return '&lt;';
+                if(m==='>') return '&gt;';
+                return m;
+            });
+        }
 
         // ==================== ORIGINAL APP CODE (PRESERVED) ====================
         // ----- Helper (do not modify) -----
@@ -423,26 +589,56 @@
     {
         question: "What is the capital of Sri Lanka?",
         options: ["Colombo", "Kandy", "Sri Jayawardenepura Kotte", "Galle"],
-        correctAnswerIndex: 2   // 0 = Colombo, 1 = Kandy, 2 = Kotte, 3 = Galle
+        correctAnswerIndex: 2
     },
     // Question 2
     {
         question: "Which year did Sri Lanka gain independence?",
         options: ["1947", "1948", "1949", "1950"],
-        correctAnswerIndex: 1   // 1948 is correct
+        correctAnswerIndex: 1
     },
     // Question 3
     {
         question: "What is the national flower of Sri Lanka?",
         options: ["Water Lily", "Blue Water Lily", "Lotus", "Rose"],
-        correctAnswerIndex: 1   // Blue Water Lily is the correct one
+        correctAnswerIndex: 1
     },
-    // ... continue up to 10 questions
-    // Question 10
+    // Question 4
     {
         question: "Who wrote the Sri Lankan national anthem?",
         options: ["Ananda Samarakoon", "Mahagama Sekara", "W. D. Amaradeva", "Kumaratunga Munidasa"],
         correctAnswerIndex: 0
+    },
+    // Add 6 more questions to reach 10
+    {
+        question: "What is the currency of Sri Lanka?",
+        options: ["Rupee", "Dollar", "Euro", "Pound"],
+        correctAnswerIndex: 0
+    },
+    {
+        question: "Which city is known as the 'Cultural Capital' of Sri Lanka?",
+        options: ["Colombo", "Kandy", "Galle", "Anuradhapura"],
+        correctAnswerIndex: 1
+    },
+    {
+        question: "What is the highest mountain in Sri Lanka?",
+        options: ["Adam's Peak", "Pidurutalagala", "Knuckles", "Hanthana"],
+        correctAnswerIndex: 1
+    },
+    {
+        question: "Which ancient kingdom was the first capital of Sri Lanka?",
+        options: ["Polonnaruwa", "Anuradhapura", "Dambadeniya", "Kandy"],
+        correctAnswerIndex: 1
+    },
+    {
+        question: "Who is the current president of Sri Lanka?",
+        options: ["Ranil Wickremesinghe", "Gotabaya Rajapaksa", "Maithripala Sirisena", "Mahinda Rajapaksa"],
+        correctAnswerIndex: 0
+    },
+    {
+        question: "What is the main language spoken in Sri Lanka?",
+        options: ["Tamil", "English", "Sinhala", "Both Sinhala and Tamil"],
+        correctAnswerIndex: 3
     }
 ]),
             createQuiz("sin_l1_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
@@ -767,11 +963,10 @@
                 let score = 0;
                 quiz.questions.forEach((q, idx) => { if (this.state.userAnswers[idx] === q.correctAnswerIndex) score++; });
                 this.state.score = score;
-                // Save to Firestore if logged in
+                // Save to Firestore subcollection under the user's document
                 if (currentUser) {
                     const lesson = this.getLessonData();
-                    db.collection('attempts').add({
-                        userId: currentUser.uid,
+                    db.collection('users').doc(currentUser.uid).collection('attempts').add({
                         quizId: quiz.id,
                         quizTitle: quiz.title,
                         lessonTitle: lesson.title,
