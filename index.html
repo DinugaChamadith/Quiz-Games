@@ -26,7 +26,7 @@
     <title>Nexus | Premium 3D Quiz Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Premium Favicon -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234f46e5'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='48' fill='url(%23grad)' stroke='white' stroke-width='2'/%3E%3Cpath fill='white' d='M44 28 L66 48 L52 52 L56 72 L34 52 L48 48 Z'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234f46e5'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='90' cy='90' r='86' fill='url(%23grad)' stroke='white' stroke-width='4'/%3E%3Cpath fill='white' d='M80 50 L118 86 L94 92 L100 128 L62 92 L86 86 Z' transform='scale(1.2) translate(-10,-10)'/%3E%3C/svg%3E">
@@ -257,7 +257,7 @@
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer group" onclick="app.navigate('home')">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-pink-500 flex items-center justify-center shadow-lg group-hover:shadow-pink-500/50 transition-all">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <i class="fas fa-bolt text-white text-2xl"></i>
                 </div>
                 <span class="text-2xl font-bold brand-font tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">NEXUS</span>
             </div>
@@ -265,13 +265,13 @@
             <div class="flex items-center gap-4">
                 <!-- Admin Button – initially hidden, shown only for admin via JavaScript -->
                 <button id="adminBtn" style="display: none;" class="md:flex items-center gap-2 bg-red-500/20 hover:bg-red-500/30 px-4 py-2 rounded-xl transition-all text-sm font-semibold border border-red-500/30" onclick="showAdminPanel()">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
+                    <i class="fas fa-plus text-white text-xl"></i>
                     Admin Panel
                 </button>
 
                 <!-- Scoreboard Button -->
                 <button id="scoreboardBtn" class="hidden md:flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-all text-sm font-semibold" onclick="showScoreboard()">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <i class="fas fa-chart-bar text-white text-xl"></i>
                     <span id="totalScoreDisplay">0</span>
                 </button>
 
@@ -344,9 +344,7 @@
     <div class="glass-panel rounded-2xl p-8 slide-up">
       <div class="flex items-center gap-3 mb-4">
         <div class="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center">
-          <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-          </svg>
+          <i class="fas fa-book-open text-indigo-400 text-2xl"></i>
         </div>
         <h3 class="text-2xl font-bold text-white">Our Mission</h3>
       </div>
@@ -357,9 +355,7 @@
     <div class="glass-panel rounded-2xl p-8 slide-up">
       <div class="flex items-center gap-3 mb-4">
         <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center">
-          <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
+          <i class="fas fa-check-circle text-pink-400 text-2xl"></i>
         </div>
         <h3 class="text-2xl font-bold text-white">Our Vision</h3>
       </div>
@@ -377,27 +373,21 @@
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     <div class="glass-panel rounded-2xl p-6 slide-up">
       <div class="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center mb-4">
-        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-        </svg>
+        <i class="fas fa-bolt text-indigo-400 text-2xl"></i>
       </div>
       <h4 class="text-xl font-bold text-white mb-2">3D Immersive UI</h4>
       <p class="text-gray-400">Experience a futuristic interface with real‑time 3D background and parallax tilt effects that respond to your mouse.</p>
     </div>
     <div class="glass-panel rounded-2xl p-6 slide-up">
       <div class="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center mb-4">
-        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
+        <i class="fas fa-chart-line text-indigo-400 text-2xl"></i>
       </div>
       <h4 class="text-xl font-bold text-white mb-2">Detailed Analytics</h4>
       <p class="text-gray-400">Track your progress with a personal scoreboard. View every attempt, score, and improvement over time.</p>
     </div>
     <div class="glass-panel rounded-2xl p-6 slide-up">
       <div class="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center mb-4">
-        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6-4h12a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 4v2a2 2 0 01-2 2H8a2 2 0 01-2-2v-2"></path>
-        </svg>
+        <i class="fas fa-database text-indigo-400 text-2xl"></i>
       </div>
       <h4 class="text-xl font-bold text-white mb-2">Secure Cloud Storage</h4>
       <p class="text-gray-400">All your scores and attempts are safely stored in Firebase, accessible anywhere, anytime.</p>
@@ -505,16 +495,17 @@
           <h3 class="text-white font-bold text-lg mb-4">Contact</h3>
           <ul class="space-y-2 text-gray-400">
             <li class="flex items-center gap-2">
-              <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-              </svg>
-              <span>support@nexusquiz.com</span>
+                <a href="https://wa.me/+94721023750" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 hover:text-indigo-400 transition-colors">
+                    <i class="fab fa-whatsapp text-indigo-400 text-lg"></i>
+                    <span>072 102 3750</span>
+                </a>
             </li>
             <li class="flex items-center gap-2">
-              <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-              </svg>
+              <i class="far fa-envelope text-indigo-400"></i>
+              <span>Dinugachamadith2009@gmail.com</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fas fa-map-marker-alt text-indigo-400 text-xl"></i>
               <span>Colombo, Sri Lanka</span>
             </li>
           </ul>
@@ -525,33 +516,25 @@
           <h3 class="text-white font-bold text-lg mb-4">Follow Us</h3>
           <div class="flex gap-4">
             <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-indigo-500/30 transition-all group">
-              <svg class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879v-6.99h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.99C18.343 21.128 22 16.991 22 12z"/>
-              </svg>
+              <i class="fab fa-facebook text-gray-400 hover:text-white transition-colors text-xl"></i>
             </a>
             <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-indigo-500/30 transition-all group">
-              <svg class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.937 4.937 0 004.604 3.417 9.868 9.868 0 01-6.102 2.104c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 0021.343-11.588c0-.214-.005-.428-.014-.64A9.935 9.935 0 0024 4.59z"/>
-              </svg>
+              <i class="fab fa-twitter text-gray-400 hover:text-white transition-colors text-xl"></i>
             </a>
-            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-indigo-500/30 transition-all group">
-              <svg class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
-              </svg>
+            <a href="https://www.instagram.com/itz_ldc?utm_source=qr&igsh=dzl2bWY4cHBoYXd6" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-indigo-500/30 transition-all group">
+              <i class="fab fa-instagram text-gray-400 hover:text-white transition-colors text-xl"></i>
             </a>
           </div>
 
           <button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" class="mt-4 w-full bg-white/10 hover:bg-indigo-500/30 py-2 rounded-xl text-sm font-semibold text-white transition-all flex items-center justify-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
-            </svg>
+            <i class="fas fa-arrow-up text-white text-sm"></i>
             Back to Top
           </button>
         </div>
       </div>
 
       <div class="border-t border-white/10 mt-10 pt-8 text-center text-gray-500 text-sm">
-        &copy; 2025 Nexus. All rights reserved. | Designed with <span class="text-pink-500">♥</span> for the future of learning.
+        &copy; 2026 Nexus. All rights reserved. | Designed with <span class="text-pink-500">♥</span> for the future of learning.
       </div>
     </div>
   </div>
