@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DCYQJFVE00"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DCYQJFVE00');
+</script>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9Q1ZEXEM8L"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-9Q1ZEXEM8L');
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexus | Premium 3D Quiz Platform</title>
@@ -191,6 +211,38 @@
             max-height: 85vh;
             overflow-y: auto;
         }
+        /* About section specific animations and enhancements */
+
+        #about .slide-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        #about .slide-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #about .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .stat-number {
+            transition: all 0.2s;
+        }
+
+        /* Footer animation */
+        footer {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        footer.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -245,6 +297,113 @@
     <main id="app-container" class="pt-32 pb-20 px-6 max-w-7xl mx-auto min-h-screen flex flex-col">
         <!-- Dynamic Content Injected Here -->
     </main>
+
+    <section id="about" class="max-w-7xl mx-auto px-6 py-20">
+  <div class="text-center mb-16 fade-in">
+    <h2 class="text-4xl md:text-5xl font-bold brand-font text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-pink-400 to-indigo-400 mb-4">
+      About Nexus
+    </h2>
+    <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+      Redefining knowledge assessment through immersive 3D experiences and cutting‑edge technology.
+    </p>
+  </div>
+
+  <!-- Stats Cards (with tilt effect) -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+    <div class="tilt-wrapper">
+      <div class="tilt-card glass-panel rounded-2xl p-8 text-center group">
+        <div class="float-element">
+          <div class="text-5xl font-bold text-indigo-400 mb-3" id="quizzesCount">0</div>
+          <div class="text-white text-lg font-semibold">Interactive Quizzes</div>
+          <p class="text-gray-400 text-sm mt-2">Across 3 modules with 80+ independent quizzes</p>
+        </div>
+      </div>
+    </div>
+    <div class="tilt-wrapper">
+      <div class="tilt-card glass-panel rounded-2xl p-8 text-center group">
+        <div class="float-element">
+          <div class="text-5xl font-bold text-indigo-400 mb-3" id="usersCount">0</div>
+          <div class="text-white text-lg font-semibold">Active Learners</div>
+          <p class="text-gray-400 text-sm mt-2">Join the growing community of knowledge seekers</p>
+        </div>
+      </div>
+    </div>
+    <div class="tilt-wrapper">
+      <div class="tilt-card glass-panel rounded-2xl p-8 text-center group">
+        <div class="float-element">
+          <div class="text-5xl font-bold text-indigo-400 mb-3" id="scoreCount">0</div>
+          <div class="text-white text-lg font-semibold">Total Points Earned</div>
+          <p class="text-gray-400 text-sm mt-2">From thousands of completed simulations</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mission & Vision -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+    <div class="glass-panel rounded-2xl p-8 slide-up">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center">
+          <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold text-white">Our Mission</h3>
+      </div>
+      <p class="text-gray-300 leading-relaxed">
+        To make learning engaging, measurable, and delightful by blending gamification with real‑world knowledge. We empower individuals to master subjects through immersive, 3D‑powered quizzes that adapt to their pace.
+      </p>
+    </div>
+    <div class="glass-panel rounded-2xl p-8 slide-up">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center">
+          <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold text-white">Our Vision</h3>
+      </div>
+      <p class="text-gray-300 leading-relaxed">
+        To become the global standard for interactive assessment, where every learner discovers the joy of mastery. We envision a future where education is as thrilling as gaming.
+      </p>
+    </div>
+  </div>
+
+  <!-- Features Grid -->
+  <div class="text-center mb-12">
+    <h3 class="text-3xl font-bold text-white mb-4">Why Nexus?</h3>
+    <p class="text-gray-400">Experience the next generation of quiz platforms</p>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="glass-panel rounded-2xl p-6 slide-up">
+      <div class="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+      </div>
+      <h4 class="text-xl font-bold text-white mb-2">3D Immersive UI</h4>
+      <p class="text-gray-400">Experience a futuristic interface with real‑time 3D background and parallax tilt effects that respond to your mouse.</p>
+    </div>
+    <div class="glass-panel rounded-2xl p-6 slide-up">
+      <div class="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <h4 class="text-xl font-bold text-white mb-2">Detailed Analytics</h4>
+      <p class="text-gray-400">Track your progress with a personal scoreboard. View every attempt, score, and improvement over time.</p>
+    </div>
+    <div class="glass-panel rounded-2xl p-6 slide-up">
+      <div class="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6-4h12a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 4v2a2 2 0 01-2 2H8a2 2 0 01-2-2v-2"></path>
+        </svg>
+      </div>
+      <h4 class="text-xl font-bold text-white mb-2">Secure Cloud Storage</h4>
+      <p class="text-gray-400">All your scores and attempts are safely stored in Firebase, accessible anywhere, anytime.</p>
+    </div>
+  </div>
+</section>
 
     <!-- Login Modal -->
     <div id="loginModal" class="modal">
@@ -310,6 +469,93 @@
             </div>
         </div>
     </div>
+
+    <footer class="relative z-10 mt-20">
+  <div class="glass-panel border-t border-white/10 rounded-t-3xl">
+    <div class="max-w-7xl mx-auto px-6 py-12 md:py-16">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+        <!-- Logo & Brand -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-pink-500 flex items-center justify-center shadow-lg">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <span class="text-2xl font-bold brand-font tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">NEXUS</span>
+          </div>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            Redefining knowledge assessment through immersive 3D experiences. Learn, play, and master with cutting‑edge technology.
+          </p>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h3 class="text-white font-bold text-lg mb-4">Explore</h3>
+          <ul class="space-y-2">
+            <li><a href="#" onclick="app.navigate('home')" class="text-gray-400 hover:text-indigo-400 transition-colors">Home</a></li>
+            <li><a href="#" onclick="app.navigate('lessons', {categoryId: 'sinhala'})" class="text-gray-400 hover:text-indigo-400 transition-colors">Sinhala</a></li>
+            <li><a href="#" onclick="app.navigate('subcategories', {categoryId: 'history'})" class="text-gray-400 hover:text-indigo-400 transition-colors">History</a></li>
+            <li><a href="#" onclick="app.navigate('lessons', {categoryId: 'gk'})" class="text-gray-400 hover:text-indigo-400 transition-colors">General Knowledge</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact -->
+        <div>
+          <h3 class="text-white font-bold text-lg mb-4">Contact</h3>
+          <ul class="space-y-2 text-gray-400">
+            <li class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+              <span>support@nexusquiz.com</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span>Colombo, Sri Lanka</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Social & Back to Top -->
+        <div class="space-y-6">
+          <h3 class="text-white font-bold text-lg mb-4">Follow Us</h3>
+          <div class="flex gap-4">
+            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-indigo-500/30 transition-all group">
+              <svg class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879v-6.99h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.99C18.343 21.128 22 16.991 22 12z"/>
+              </svg>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-indigo-500/30 transition-all group">
+              <svg class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.937 4.937 0 004.604 3.417 9.868 9.868 0 01-6.102 2.104c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 0021.343-11.588c0-.214-.005-.428-.014-.64A9.935 9.935 0 0024 4.59z"/>
+              </svg>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-indigo-500/30 transition-all group">
+              <svg class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
+              </svg>
+            </a>
+          </div>
+
+          <button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" class="mt-4 w-full bg-white/10 hover:bg-indigo-500/30 py-2 rounded-xl text-sm font-semibold text-white transition-all flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+            </svg>
+            Back to Top
+          </button>
+        </div>
+      </div>
+
+      <div class="border-t border-white/10 mt-10 pt-8 text-center text-gray-500 text-sm">
+        &copy; 2025 Nexus. All rights reserved. | Designed with <span class="text-pink-500">♥</span> for the future of learning.
+      </div>
+    </div>
+  </div>
+</footer>
 
     <script>
         // ==================== FIREBASE INIT ====================
@@ -582,70 +828,67 @@
         // *******************************
         // 1. SINHALA – 16 lessons, each with 2 quizzes (explicit)
         // *******************************
+
         // Lesson 01
-        const sinL1 = createLesson("sin_l1", "පාඩම 1: සිංහල ව්‍යාකරණ සාධක", [
+        const sinL1 = createLesson("sin_l1", "පාඩම 1: සතර කන් මන්ත්‍රණය", [
             createQuiz("sin_l1_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", [
-    // Question 1
-    {
-        question: "What is the capital of Sri Lanka?",
-        options: ["Colombo", "Kandy", "Sri Jayawardenepura Kotte", "Galle"],
-        correctAnswerIndex: 2
-    },
-    // Question 2
-    {
-        question: "Which year did Sri Lanka gain independence?",
-        options: ["1947", "1948", "1949", "1950"],
-        correctAnswerIndex: 1
-    },
-    // Question 3
-    {
-        question: "What is the national flower of Sri Lanka?",
-        options: ["Water Lily", "Blue Water Lily", "Lotus", "Rose"],
-        correctAnswerIndex: 1
-    },
-    // Question 4
-    {
-        question: "Who wrote the Sri Lankan national anthem?",
-        options: ["Ananda Samarakoon", "Mahagama Sekara", "W. D. Amaradeva", "Kumaratunga Munidasa"],
-        correctAnswerIndex: 0
-    },
-    // Add 6 more questions to reach 10
-    {
-        question: "What is the currency of Sri Lanka?",
-        options: ["Rupee", "Dollar", "Euro", "Pound"],
-        correctAnswerIndex: 0
-    },
-    {
-        question: "Which city is known as the 'Cultural Capital' of Sri Lanka?",
-        options: ["Colombo", "Kandy", "Galle", "Anuradhapura"],
-        correctAnswerIndex: 1
-    },
-    {
-        question: "What is the highest mountain in Sri Lanka?",
-        options: ["Adam's Peak", "Pidurutalagala", "Knuckles", "Hanthana"],
-        correctAnswerIndex: 1
-    },
-    {
-        question: "Which ancient kingdom was the first capital of Sri Lanka?",
-        options: ["Polonnaruwa", "Anuradhapura", "Dambadeniya", "Kandy"],
-        correctAnswerIndex: 1
-    },
-    {
-        question: "Who is the current president of Sri Lanka?",
-        options: ["Ranil Wickremesinghe", "Gotabaya Rajapaksa", "Maithripala Sirisena", "Mahinda Rajapaksa"],
-        correctAnswerIndex: 0
-    },
-    {
-        question: "What is the main language spoken in Sri Lanka?",
-        options: ["Tamil", "English", "Sinhala", "Both Sinhala and Tamil"],
-        correctAnswerIndex: 3
-    }
-]),
+                // Questions
+                {
+                    question: "ජාතක පොතේ එන දීර්ඝතම ජාතක කතාව කුමක්ද?",
+                    options: ["වෙස්සන්තර ජාතකය", "මඛාදේව ජාතකය", "උම්මග්ග ජාතකය", "සස ජාතකය"],
+                    correctAnswerIndex: 2
+                },
+                {
+                    question: "ජාතක පොත ඇසුරින් බිහිවූ 'ගී කාව්‍ය' මොනවාද?",
+                    options: ["කව්සිළුමිණ සහ අමාවතුර", "සසදාවත සහ බුත්සරණ", "මුවදෙව්දාවත, සසදාවත සහ කව්සිළුමිණ", "සද්ධර්මරත්නාවලිය සහ ජාතක පොත"],
+                    correctAnswerIndex: 2
+                },
+                {
+                    question: "උම්මග්ග ජාතකය රචනා කිරීමේ ප්‍රධාන අරමුණ ලෙස දක්වා ඇත්තේ කුමක්ද?",
+                    options: ["රජුන්ගේ වීරත්වය පෙන්වීම", "දේශීය චාරිත්‍ර වාරිත්‍ර හඳුන්වා දීම", "මහෞෂධ පණ්ඩිතයන්ගේ ප්‍රඥා මහිමය ප්‍රකාශ කිරීම", "බරණැස් නුවර තොරතුරු විස්තර කිරීම"],
+                    correctAnswerIndex: 2
+                },
+                {
+                    question: "සිංහල ජාතක පොත රචනා කිරීම සඳහා මූලාශ්‍ර කරගත් ග්‍රන්ථය කුමක්ද?",
+                    options: ["පාලි ජාතකට්ඨකතාව", "මහාවංසය", "සද්ධර්මරත්නාවලිය", "බුද්ධවංසය"],
+                    correctAnswerIndex: 0
+                },
+                {
+                    question: "'සතර කන් මන්ත්‍රණය' කොටස උපුටා ගෙන ඇත්තේ කුමන ජාතක කතාවෙන්ද?",
+                    options: ["සස ජාතකය", "උම්මග්ග ජාතකය", "මඛාදේව ජාතකය", "විධුර ජාතකය"],
+                    correctAnswerIndex: 1
+                },
+                {
+                    question: "පන්සිය පනස් ජාතක පොත සිංහලයට පරිවර්තනය වූයේ කුමන රාජ්‍ය සමයේදී ද?",
+                    options: ["අනුරාධපුර යුගය", "පොළොන්නරු යුගය", "කුරුණෑගල යුගය", "දඹදෙණි යුගය"],
+                    correctAnswerIndex: 2
+                },
+                {
+                    question: "සිංහල ජාතක පොතේ ඇතුළත් මුළු ජාතක කතා සංඛ්‍යාව කොපමණද?",
+                    options: ["500", "550", "547", "555"],
+                    correctAnswerIndex: 2
+                },
+                {
+                    question: "ජාතක පොත සිංහලයට නැගීමට මූලිකත්වය ගත් ඇමතිවරයා කවුද?",
+                    options: ["දේවපතිරාජ ඇමති", "වීරසිංහ ප්‍රතිරාජ ඇමති", "අලගක්කෝනාර ඇමති", "පරාක්‍රම ඇමති"],
+                    correctAnswerIndex: 1
+                },
+                {
+                    question: "'වෙසන්තර ජාතකය, ගුත්තිල කාව්‍යය, කුස ජාතක කාව්‍ය' යන ග්‍රන්ථ තුනම පොදුවේ අයත් වන විශේෂය කුමක්ද?",
+                    options: ["සන්දේශ කාව්‍ය", "ප්‍රකීර්ණක ගද්‍ය", "කාව්‍ය ග්‍රන්ථ", "ධර්ම ව්‍යාඛ්‍යාන"],
+                    correctAnswerIndex: 2
+                },
+                {
+                    question: "ජාතක කතා පොතේ ලක්ෂණයක් නොවන්නේ මින් කුමක්ද?",
+                    options: ["වෛය්‍යාකරණ නොතිබීම", "ජාතක ගාථා ස්වල්පයක් දක්නට ලැබීම", "අතීත කතාව අඛණ්ඩව ඉදිරිපත් කිරීම", "මුල් කෘතියෙහි සෘජු පරිවර්තනයක් නොවීම"],
+                    correctAnswerIndex: 0
+                },
+            ]),
             createQuiz("sin_l1_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
         ]);
         const sinL2 = createLesson("sin_l2", "පාඩම 2: සිංහල ව්‍යාකරණ සාධක", [
             createQuiz("sin_l2_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
-            createQuiz("sin_l2_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", [])
+            createQuiz("sin_l2_q2", "ප්‍රශ්නාවලිය 2: උසස් ව්‍යාකරණ", []),
         ]);
         const sinL3 = createLesson("sin_l3", "පාඩම 3: සිංහල ව්‍යාකරණ සාධක", [
             createQuiz("sin_l3_q1", "ප්‍රශ්නාවලිය 1: මූලික සංකල්ප", []),
@@ -1019,6 +1262,88 @@
         });
         
         window.onload = () => { app.init(); };
+
+        // ==================== ABOUT SECTION FUNCTIONALITY ====================
+// Wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', function() {
+  // Scroll reveal for about section elements
+  const revealElements = document.querySelectorAll('#about .slide-up');
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  
+  revealElements.forEach(el => observer.observe(el));
+  
+  // Optional: Animate stats counters (replace with real data from Firebase if available)
+  function animateNumber(element, target) {
+    let current = 0;
+    const increment = target / 50; // 50 steps, ~0.5s if 10ms per step
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= target) {
+        element.textContent = target;
+        clearInterval(timer);
+      } else {
+        element.textContent = Math.floor(current);
+      }
+    }, 10);
+  }
+  
+  // Set your actual statistics here
+  const stats = {
+    quizzes: 80,      // total quizzes in your platform
+    users: 1250,      // replace with actual number from Firebase
+    totalScore: 54720 // replace with sum of all user scores from Firebase
+  };
+  
+  // Use Firebase to get real counts if needed
+  // For demonstration, we just set static numbers
+  const quizzesEl = document.getElementById('quizzesCount');
+  const usersEl = document.getElementById('usersCount');
+  const scoreEl = document.getElementById('scoreCount');
+  
+  // Animate when they become visible
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateNumber(quizzesEl, stats.quizzes);
+        animateNumber(usersEl, stats.users);
+        animateNumber(scoreEl, stats.totalScore);
+        statsObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  
+  if (quizzesEl) statsObserver.observe(quizzesEl.parentElement.parentElement);
+});
+
+// ==================== END ABOUT SECTION ====================
+
+// Scroll reveal for footer
+const footer = document.querySelector('footer');
+if (footer) {
+  const footerObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        footer.classList.add('visible');
+        footerObserver.unobserve(footer);
+      }
+    });
+  }, { threshold: 0.1 });
+  footerObserver.observe(footer);
+}
+
+// Update copyright year dynamically
+const copyrightYear = document.querySelector('footer .border-t p');
+if (copyrightYear) {
+  copyrightYear.innerHTML = copyrightYear.innerHTML.replace('2025', new Date().getFullYear());
+}
     </script>
 </body>
 </html>
