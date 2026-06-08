@@ -1,2 +1,2 @@
-# Quiz-Games
-Quiz game center
+# StudyQuiz SL
+Educational Quiz games center
